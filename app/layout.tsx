@@ -5,7 +5,7 @@ import "./globals.css";
 const inriaSans = Inria_Sans({
   subsets: ["latin"],
   variable: "--font-inria-sans",
-  weight: ["300", "400", "700"], // los pesos que quieras
+  weight: ["300", "400", "700"],
 });
 
 const montserrat = Montserrat({

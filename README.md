@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MyEvent
 
-## Getting Started
+> **Para correr el proyecto en tu máquina local utiliza:**
+> ```
+> npx next dev
+> ```
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Descripción del Proyecto
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**MyEvent** es una plataforma web diseñada para facilitar la organización y gestión de eventos de manera práctica y ordenada. Su propósito es ofrecer una experiencia completa tanto para organizadores como para asistentes, integrando funciones sociales, herramientas colaborativas y notificaciones oportunas.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+El sistema permite crear eventos, invitar participantes, confirmar asistencias, compartir recursos y mantener una comunicación clara entre organizadores e invitados. De esta forma, se busca reemplazar métodos tradicionales poco eficientes (como listas manuales o chats dispersos) por una plataforma digital moderna, intuitiva y accesible.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Características Principales
 
-To learn more about Next.js, take a look at the following resources:
+1. **Gestión de usuarios y accesos**
+   - Registro y autenticación mediante correo electrónico.
+   - Edición de perfil (nombre, correo, imagen).
+   - Eliminación segura de cuenta.
+   - Cierre de sesión desde cualquier dispositivo.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Creación y administración de eventos**
+   - Registro de eventos con nombre, descripción, imagen, fecha, hora y lugar.
+   - Privacidad configurable (evento público o privado).
+   - Edición y eliminación de eventos.
+   - Inclusión de rutas alternativas y coorganizadores.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Invitación y confirmación de asistencia**
+   - Búsqueda e invitación de usuarios por nombre o correo.
+   - Visualización de invitados confirmados.
+   - Confirmación de asistencia (sí / no).
+   - Posibilidad de desvincularse de un evento.
 
-## Deploy on Vercel
+4. **Recursos compartidos**
+   - Subida de archivos relevantes (PDF, imágenes, listas).
+   - Compartición de enlaces externos.
+   - Acceso a todos los recursos por parte de los asistentes.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **Mapas y localización**
+   - Integración con servicios de mapas para mostrar ubicaciones exactas.
+   - Visualización de puntos alternativos de encuentro.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. **Notificaciones**
+   - Alertas sobre invitaciones, cambios en eventos y nuevos recursos compartidos.
+   - Gestión de confirmaciones de asistencia.
+
+7. **Exploración de eventos públicos**
+   - Visualización de eventos disponibles.
+   - Guardado de favoritos y gestión de listas personales.
+
+---
+
+## Suposiciones, Restricciones y Reglas de Negocio
+
+- Los eventos son creados manualmente por usuarios registrados.  
+- La plataforma no gestiona pagos ni entradas.  
+- Los archivos compartidos están sujetos a límites de formato y tamaño.  
+- Solo los organizadores pueden eliminar un evento o retirar invitados.  
+- La aplicación se limita a versión web en esta primera etapa.  
+
+**Reglas destacadas:**
+- No se permiten eventos duplicados con el mismo nombre.  
+- Un usuario puede tener como máximo 5 eventos activos creados.  
+- Los eventos públicos no pueden superar los 100 asistentes confirmados.  
+- Las invitaciones privadas expiran después de 5 días.  
+
+---
+
+## Justificación y ODS Relacionados
+
+El proyecto se alinea con los Objetivos de Desarrollo Sostenible (ODS):
+
+- **ODS 9: Industria, innovación e infraestructura**, al plantear una solución digital accesible que optimiza la organización de actividades.  
+- **ODS 11: Ciudades y comunidades sostenibles**, al facilitar la coordinación de personas, horarios y ubicaciones, promoviendo un uso más eficiente del espacio urbano.  
+
+---
+
+## Tecnologías Utilizadas
+
+- **Next.js** (con TypeScript) para frontend y backend en un mismo entorno.  
+- **Prisma** para la gestión de base de datos.  
+- **API de Google Maps** para la geolocalización de eventos.  
+- **Node.js** como entorno de ejecución.  
+- **Scrum** como metodología ágil para la gestión del proyecto.  
+
+---
