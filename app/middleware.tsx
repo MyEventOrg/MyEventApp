@@ -1,0 +1,1 @@
+//Aqui irán restricciones con tokens, post conexion backend (rutas seguras)
