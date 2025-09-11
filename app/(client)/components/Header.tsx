@@ -2,17 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(true);
-
+    const router = useRouter();
     return (
         <header className="w-full bg-white text-white">
             <nav className="mx-auto relative flex items-center justify-between py-8 px-12 border-b-[1.5px] border-bordergray">
-                <div className="font-bold text-primary text-3xl">MyEvent</div>
-
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
+                    <img
+                        src="/logo.png"
+                        alt="Notificaciones"
+                        className="w-8 h-8"
+                    />
+                    <div className="font-bold text-primary text-3xl">MyEvent</div>
+                </div>
                 <ul className="flex flex-wrap items-center gap-6">
                     <li>
                         <img
