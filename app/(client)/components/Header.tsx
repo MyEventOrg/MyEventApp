@@ -1,16 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {
     const pathname = usePathname();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(true);
     const router = useRouter();
+    const dropdownRef = useRef<HTMLLIElement>(null);
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsDropdownOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
     return (
         <header className="w-full bg-white text-white">
-            <nav className="mx-auto relative flex items-center justify-between py-8 px-12 border-b-[1.5px] border-bordergray">
+            <nav className="mx-auto relative flex items-center justify-between py-6 px-12 border-b-[1.5px] border-bordergray">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
                     <img
                         src="/logo.png"
@@ -20,25 +36,67 @@ export default function Header() {
                     <div className="font-bold text-primary text-3xl">MyEvent</div>
                 </div>
                 <ul className="flex flex-wrap items-center gap-6">
+                    <button
+                        onClick={() => router.push("/crearEvento")}
+                        className="flex cursor-pointer items-center gap-2 bg-[#39739d] text-white px-5 py-2 rounded-[20px] shadow hover:bg-[#2e5c7e] transition"
+                    >
+                        <span className="text-2xl font-bold">+</span>
+                        <span>Crear Evento</span>
+                    </button>
+                    <li className="relative" ref={dropdownRef}>
+                        <div
+                            className="flex items-center gap-2 cursor-pointer"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            <img
+                                src="/User.png"
+                                alt="Usuario"
+                                className="w-8 h-8 rounded-full"
+                            />
+                            <p className="text-grayish text-xl">María Gonzales</p>
+                        </div>
+
+                        <div
+                            className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow z-50 transition-all duration-300 ease-in-out overflow-hidden ${isDropdownOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
+                                }`}
+                        >
+                            <ul className="flex flex-col text-left">
+                                <li>
+                                    <Link
+                                        href="/perfil"
+                                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Ver Perfil
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/misEventos"
+                                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Mis Eventos
+                                    </Link>
+                                </li>
+
+                                {/* Separador */}
+                                <li className="border-t border-gray-200 mt-12">
+                                    <button
+                                        onClick={() => router.push("/login")}
+                                        className="block cursor-pointer w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                                    >
+                                        Cerrar Sesión
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
                     <li>
                         <img
                             src="/Doorbell.png"
                             alt="Notificaciones"
                             className="w-8 h-8"
                         />
-                    </li>
-                    <li className="flex items-center gap-2">
-                        <img
-                            src="/User.png"
-                            alt="Usuario"
-                            className="w-8 h-8 rounded-full"
-                        />
-                        <p className="text-grayish text-xl">María Gonzales</p>
-                    </li>
-                    <li>
-                        <button className="text-grayish text-xl hover:text-danger transition">
-                            Cerrar Sesión
-                        </button>
                     </li>
                 </ul>
                 <button
@@ -63,34 +121,24 @@ export default function Header() {
                 }}            >
                 <nav className="mx-auto flex items-center justify-between px-20">
                     <ul className="flex flex-wrap items-center gap-6">
-                        <li className={`py-8 ${pathname === "/" ? "border-b-2 border-primary" : ""}`}>
+                        <li className={`py-4 ${pathname === "/" ? "border-b-2 border-primary" : ""}`}>
                             <Link href="/" className={`text-xl text-headertext ${pathname === "/" ? "text-primary" : "hover:text-grayish"}`}>
                                 Resumen
                             </Link>
                         </li>
-                        <li className={`py-8 ${pathname === "/misEventos" ? "border-b-2 border-primary" : ""}`}>
-                            <Link href="/misEventos" className={`text-xl text-headertext ${pathname === "/misEventos" ? "text-primary" : "hover:text-grayish"}`}>
-                                Mis Eventos
+                        <li className={`py-4 ${pathname === "/buscarEventos" ? "border-b-2 border-primary" : ""}`}>
+                            <Link href="/buscarEventos" className={`text-xl text-headertext ${pathname === "/buscarEventos" ? "text-primary" : "hover:text-grayish"}`}>
+                                Buscar Eventos
                             </Link>
                         </li>
-                        <li className={`py-8 ${pathname === "/eventosAsistidos" ? "border-b-2 border-primary" : ""}`}>
-                            <Link href="/eventosAsistidos" className={`text-xl text-headertext ${pathname === "/eventosAsistidos" ? "text-primary" : "hover:text-grayish"}`}>
-                                Eventos a los que asistió
-                            </Link>
-                        </li>
-                        <li className="py-8">
-                            <Link href="/eventosGuardados" className="text-xl text-headertext hover:text-grayish">
+                        <li className={`py-4 ${pathname === "/eventosGuardados" ? "border-b-2 border-primary" : ""}`}>
+                            <Link href="/eventosGuardados" className={`text-xl text-headertext ${pathname === "/eventosGuardados" ? "text-primary" : "hover:text-grayish"}`}>
                                 Eventos Guardados
                             </Link>
                         </li>
-                        <li className="py-8">
-                            <Link href="/eventosPublicos" className="text-xl text-headertext hover:text-grayish">
-                                Eventos Públicos
-                            </Link>
-                        </li>
-                        <li className="py-8">
-                            <Link href="/perfil" className="text-xl text-headertext hover:text-grayish">
-                                Mi Perfil
+                        <li className={`py-4 ${pathname === "/eventosAsistidos" ? "border-b-2 border-primary" : ""}`}>
+                            <Link href="/eventosAsistidos" className={`text-xl text-headertext ${pathname === "/eventosAsistidos" ? "text-primary" : "hover:text-grayish"}`}>
+                                Eventos a los que asistió
                             </Link>
                         </li>
                     </ul>

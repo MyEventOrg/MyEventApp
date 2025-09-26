@@ -1,5 +1,9 @@
+import NoMainHeader from "../components/NoMainHeader";
 export default function MisEventos() {
     return (
-        <h1>MisEventos</h1>
+        <>
+            <NoMainHeader title="Mis Eventos" />
+            <main className="px-12 py-8">Mis Eventos</main>
+        </>
     );
 }
