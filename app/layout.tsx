@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inria_Sans, Montserrat } from "next/font/google";
 import "./globals.css";
+import { UserProvider } from "./context/userContext";
 
 const inriaSans = Inria_Sans({
   subsets: ["latin"],
@@ -22,8 +23,9 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
   return (
     <html lang="en">
       <body className={`${inriaSans.variable} ${montserrat.variable}`}>
-
-        {children}
+        <UserProvider>
+          {children}
+        </UserProvider>
       </body>
     </html>
   );

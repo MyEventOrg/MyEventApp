@@ -5,8 +5,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import UsuarioApi from "../../api/usuario";
 import UserMenuDropdown from "./home_components/UserDropDown";
+import { useUser } from "../../context/userContext";
 
 export default function Header() {
+    const { user, isAuthenticated, loading } = useUser();
+
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(true);
@@ -59,12 +62,18 @@ export default function Header() {
                             className="flex items-center gap-2 cursor-pointer"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
-                            <img
-                                src="/User.png"
-                                alt="Usuario"
-                                className="w-8 h-8 rounded-full"
-                            />
-                            <p className="text-grayish text-xl">María Gonzales</p>
+                            {isAuthenticated ? (
+                                <>
+                                    <img
+                                        src="/User.png"
+                                        alt="Usuario"
+                                        className="w-8 h-8 rounded-full"
+                                    />
+                                    <p className="text-grayish text-xl">{user?.apodo}</p>
+                                </>
+                            ) : (
+                                <>No has iniciado sesión</>
+                            )}
                         </div>
                         <UserMenuDropdown open={isDropdownOpen} onLogout={handleLogout} />
                     </li>
