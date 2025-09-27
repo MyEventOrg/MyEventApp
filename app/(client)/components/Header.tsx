@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-
+import UsuarioApi from "../../api/usuario";
 export default function Header() {
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -24,6 +24,15 @@ export default function Header() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+    const handleLogout = async () => {
+        setIsDropdownOpen(false);
+        try {
+            const resp = await UsuarioApi.cerrarSesion();
+        } catch (e) {
+        } finally {
+            router.push("/login");
+        }
+    };
     return (
         <header className="w-full bg-white text-white">
             <nav className="mx-auto relative flex items-center justify-between py-6 px-12 border-b-[1.5px] border-bordergray">
@@ -81,7 +90,7 @@ export default function Header() {
                                 {/* Separador */}
                                 <li className="border-t border-gray-200 mt-12">
                                     <button
-                                        onClick={() => router.push("/login")}
+                                        onClick={handleLogout}
                                         className="block cursor-pointer w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                                     >
                                         Cerrar Sesión
