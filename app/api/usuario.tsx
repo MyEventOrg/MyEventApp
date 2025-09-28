@@ -15,5 +15,20 @@ const cerrarSesion = async () => {
     }
 };
 
+export type CrearUsuarioPayload = {
+    nombres: string;
+    apellidos: string;
+    apodo: string;
+    email: string;
+    password: string;
+};
+const crearUsuario = async (data: CrearUsuarioPayload) => {
+    try {
+        const res = await base.post("/crear-usuario", data);
+        return res.data;
+    } catch {
+        return { success: false, message: "No se pudo crear el usuario" };
+    }
+};
 
-export default { iniciarSesion , cerrarSesion};
+export default { iniciarSesion, cerrarSesion, crearUsuario };

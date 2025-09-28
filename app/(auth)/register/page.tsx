@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import CodigoVerificacion from "./components/codigoverificacion";
 import Formulario from "./components/formulario";
+import NotificacionApi from "../../api/notificacion";
 
 export default function Register() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -11,7 +12,7 @@ export default function Register() {
 
   const [email, setEmail] = useState("");
 
-  const validateEmail = (e: React.FormEvent) => {
+  const validateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -21,10 +22,18 @@ export default function Register() {
     }
 
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await NotificacionApi.enviarCodigo({ email });
+      if (res.success) {
+        setStep(2);
+      } else {
+        alert(res.message);
+      }
+    } catch {
+      alert("Error enviando el código");
+    } finally {
       setLoading(false);
-      setStep(2); // pasa a verificación
-    }, 2000);
+    }
   };
 
   return (
@@ -39,10 +48,7 @@ export default function Register() {
         {step === 2 && "Te enviamos un código a tu correo"}
         {step === 3 && "Únete a MyEvent"}
       </p>
-
-      {/* Contenedor con slide horizontal */}
       <div className="relative w-full h-[300px]">
-        {/* Paso 1: email */}
         <form
           onSubmit={validateEmail}
           className={`absolute w-full transition-all duration-700 ${step === 1
@@ -72,8 +78,6 @@ export default function Register() {
             </div>
           )}
         </form>
-
-        {/* Paso 2: código verificación */}
         <div
           className={`absolute w-full transition-all duration-700 ${step === 2
             ? "translate-x-0 opacity-100"
@@ -87,8 +91,6 @@ export default function Register() {
             onVerified={() => setStep(3)}
           />
         </div>
-
-        {/* Paso 3: formulario */}
         <div
           className={`absolute w-full transition-all duration-700 ${step === 3
             ? "translate-x-0 opacity-100"

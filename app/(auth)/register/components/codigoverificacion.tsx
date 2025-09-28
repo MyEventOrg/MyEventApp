@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NotificacionApi from "../../../api/notificacion";
 
 interface Props {
     email: string;
@@ -9,6 +10,7 @@ interface Props {
 
 export default function CodigoVerificacion({ email, onVerified }: Props) {
     const [code, setCode] = useState(Array(6).fill(""));
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (value: string, index: number) => {
         if (/^\d?$/.test(value)) {
@@ -24,14 +26,28 @@ export default function CodigoVerificacion({ email, onVerified }: Props) {
         }
     };
 
-    const verifyCode = (e: React.FormEvent) => {
+    const verifyCode = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (code.join("").length === 6) {
-            onVerified();
-        } else {
+        if (code.join("").length !== 6) {
             alert("Completa los 6 dígitos");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await NotificacionApi.verificarCodigo({ email, code: code.join("") });
+            if (res.success) {
+                onVerified();
+            } else {
+                alert(res.message);
+            }
+        } catch {
+            alert("Error de conexión con el servidor");
+        } finally {
+            setLoading(false);
         }
     };
+
 
     return (
         <form onSubmit={verifyCode} className="flex flex-col items-center gap-6">
@@ -57,9 +73,10 @@ export default function CodigoVerificacion({ email, onVerified }: Props) {
 
             <button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-[#4a90e2] text-white py-2 rounded-md shadow hover:bg-[#3a78b8] transition"
             >
-                Verificar código
+                {loading ? "Verificando..." : "Verificar código"}
             </button>
         </form>
     );
