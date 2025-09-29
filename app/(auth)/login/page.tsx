@@ -11,7 +11,6 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [mensaje, setMensaje] = useState<string | null>(null);
-
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -21,18 +20,19 @@ export default function LoginPage() {
 
         try {
             const resp = await UsuarioApi.iniciarSesion({ email, password });
-            console.log(resp)
             if (resp?.success) {
-                router.push("/");
-            } else {
-                setMensaje(resp?.message || "Credenciales inválidas");
+                //el middleware hace toda la logicaaa
+                window.location.reload();
+                return;
             }
-        } catch (err) {
+            setMensaje(resp?.message || "Credenciales inválidas");
+        } catch {
             setMensaje("Error de conexión con el servidor");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <>

@@ -9,7 +9,7 @@ import { useUser } from "../../context/userContext";
 
 export default function Header() {
     const { user, isAuthenticated, loading } = useUser();
-
+    
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(true);
