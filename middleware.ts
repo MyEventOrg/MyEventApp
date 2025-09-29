@@ -56,12 +56,10 @@ export function middleware(req: NextRequest) {
 
     // --- CON sesión, validar por rol ---
     if (isAdminRoute && role !== "admin") {
-        // sin permiso para admin
+
         return NextResponse.redirect(new URL("/", req.url));
     }
     if (isUserRoute && role !== "user") {
-        // si quieres que admin NO entre a rutas de usuario, deja este guard;
-        // si admin sí puede, comenta este bloque.
         return NextResponse.redirect(new URL("/eventosPublicos", req.url));
     }
 
