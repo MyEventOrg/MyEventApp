@@ -47,7 +47,7 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
 
     return (
         <div>
-            <label className="font-semibold">Ubicación (Lima, Perú)*</label>
+            <label className="font-semibold">Ubicación (Lima, Perú)</label>
             {isLoaded && (
                 <Autocomplete
                     onLoad={onLoadAutocomplete}
@@ -101,7 +101,7 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
                     />
                 </GoogleMap>
             )}
-            <span className="text-xs text-gray-500">Solo se permiten eventos en la provincia de Lima, Perú</span>
+            <span className="text-xs text-gray-500">Solo se permiten eventos en Lima, Perú</span>
         </div>
     );
 };
