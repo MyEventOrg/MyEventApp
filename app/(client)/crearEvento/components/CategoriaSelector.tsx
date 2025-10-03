@@ -17,11 +17,20 @@ const CategoriaSelector: React.FC<Props> = ({ categorias, value, onChange }) => 
             onChange={onChange}
             required
         >
-            <option value="" disabled>Selecciona una categoría</option>
+            <option value="" disabled>
+                {categorias.length === 0 ? "Cargando categorías..." : "Selecciona una categoría"}
+            </option>
             {categorias.map(cat => (
-                <option key={cat.categoria_id} value={cat.categoria_id}>{cat.nombre}</option>
+                <option key={cat.categoria_id} value={cat.categoria_id}>
+                    {cat.nombre}
+                </option>
             ))}
         </select>
+        {categorias.length === 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+                Las categorías se están cargando...
+            </p>
+        )}
     </div>
 );
 

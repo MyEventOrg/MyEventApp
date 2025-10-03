@@ -28,4 +28,15 @@ const updateEstadoEvento = async (id: number, estado: string) => {
         return { success: false, message: "No se pudo actualizar el estado del evento" };
     }
 };
-export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento };
+
+// Crear nuevo evento
+const createEvento = async (eventoData: any) => {
+    try {
+        const res = await base.post(`/eventos`, eventoData);
+        return res.data;
+    } catch {
+        return { success: false, message: "No se pudo crear el evento" };
+    }
+};
+
+export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento };

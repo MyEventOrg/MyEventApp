@@ -8,9 +8,12 @@ import ImagenUpload from "./components/ImagenUpload";
 import RecursoUpload from "./components/RecursoUpload";
 import UbicacionInput from "./components/UbicacionInput";
 import useCategorias from "./hooks/useCategorias";
+import eventoApi from "../../api/eventoo";
+import { useUser } from "../../context/userContext";
 
 export default function CrearEvento() {
     const router = useRouter();
+    const { user } = useUser(); // Obtener usuario del contexto
     const [form, setForm] = useState<EventFormData>({
         titulo: "",
         descripcion_corta: "",
@@ -29,6 +32,7 @@ export default function CrearEvento() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = e.target;
         const { name, value, type } = target;
+        
         if (type === "checkbox" && target instanceof HTMLInputElement) {
             setForm((prev) => ({ ...prev, tipo_evento: target.checked ? "privado" : "publico" }));
         } else if (type === "file" && target instanceof HTMLInputElement) {
@@ -39,8 +43,10 @@ export default function CrearEvento() {
             } else if (name === "url_recurso" && file) {
                 setForm((prev) => ({ ...prev, url_recurso: file }));
             }
-        } else if (type === "select-one") {
-            setForm((prev) => ({ ...prev, categoria_id: Number(value) }));
+        } else if (name === "categoria_id") {
+            // Manejo específico para categoría
+            const categoriaId = value ? Number(value) : undefined;
+            setForm((prev) => ({ ...prev, categoria_id: categoriaId }));
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
         }
@@ -60,38 +66,65 @@ export default function CrearEvento() {
     };
 
 
-    // Facade para el formulario
+    // Facade para el formulario - Conectado al backend
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // campos obligatorios
-        const required = ["titulo", "descripcion_corta", "descripcion_larga", "fecha_evento", "hora", "ubicacion", "url_imagen", "categoria_id", "latitud", "longitud"];
-        for (const key of required) {
-            if (!form[key as keyof EventFormData]) {
-                alert("Todos los campos obligatorios deben estar completos.");
+        
+        try {
+            // Validar que el usuario esté autenticado (todos deben estar registrados)
+            if (!user) {
+                alert("Error: Usuario no autenticado. Por favor, inicia sesión.");
+                router.push("/login");
                 return;
             }
-        }
-        // Crear FormData
-        const fd = new FormData();
-        Object.entries(form).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                if (value instanceof File) {
-                    fd.append(key, value);
-                } else {
-                    fd.append(key, value.toString());
+
+            // Validaciones del frontend
+            const required = ["titulo", "descripcion_corta", "fecha_evento", "hora", "ubicacion"];
+            for (const key of required) {
+                if (!form[key as keyof EventFormData]) {
+                    alert(`El campo ${key.replace('_', ' ')} es obligatorio.`);
+                    return;
                 }
             }
-        });
-        // Envio al back
-        const res = await fetch("/api/evento", {
-            method: "POST",
-            body: fd,
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert("Evento creado correctamente.");
-        } else {
-            alert("Error al crear evento: " + (data.error || ""));
+
+            // Validación de ubicación
+            if (!form.latitud || !form.longitud) {
+                alert("Debe seleccionar una ubicación válida en el mapa.");
+                return;
+            }
+
+            // Preparar datos para enviar al backend 
+            const eventoData = {
+                titulo: form.titulo,
+                descripcion_corta: form.descripcion_corta,
+                descripcion_larga: form.descripcion_larga || "",
+                fecha_evento: form.fecha_evento,
+                hora: form.hora,
+                tipo_evento: form.tipo_evento,
+                ubicacion: form.ubicacion,
+                latitud: form.latitud?.toString(),
+                longitud: form.longitud?.toString(),
+                ciudad: form.ciudad || "",
+                distrito: form.distrito || "",
+                categoria_id: form.categoria_id || null,
+                usuario_id: user.usuario_id // Usuario validado arriba (todos registrados)
+            };
+
+            console.log("Enviando datos:", eventoData);
+
+            // Enviar al backend
+            const result = await eventoApi.createEvento(eventoData);
+
+            if (result.success) {
+                alert("Evento creado correctamente.");
+                router.push("/"); // Redirigir a la página principal
+            } else {
+                alert("Error al crear evento: " + (result.message || "Error desconocido"));
+            }
+
+        } catch (error) {
+            console.error("Error al crear evento:", error);
+            alert("Error inesperado al crear el evento. Intente nuevamente.");
         }
     };
 

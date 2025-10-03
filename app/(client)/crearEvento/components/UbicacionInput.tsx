@@ -25,7 +25,8 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
     const onPlaceChanged = () => {
         if (autocompleteRef.current) {
             const place = autocompleteRef.current.getPlace();
-            if (place.geometry && place.geometry.location) {
+            // Verificacion que existe el lugar
+            if (place && place.geometry && place.geometry.location) {
                 const lat = place.geometry.location.lat();
                 const lng = place.geometry.location.lng();
                 onSelect(
@@ -35,6 +36,8 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
                     getAddressComponent(place, "locality"),
                     getAddressComponent(place, "administrative_area_level_2")
                 );
+            } else {
+                console.warn('No se pudo obtener la ubicación del lugar seleccionado');
             }
         }
     };
@@ -47,7 +50,7 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
 
     return (
         <div>
-            <label className="font-semibold">Ubicación (Lima, Perú)</label>
+            <label className="font-semibold">Ubicación (Perú)*</label>
             {isLoaded && (
                 <Autocomplete
                     onLoad={onLoadAutocomplete}
@@ -55,10 +58,10 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
                     options={{
                         componentRestrictions: { country: "pe" },
                         bounds: {
-                            north: -11.7,
-                            south: -12.4,
-                            east: -76.7,
-                            west: -77.2,
+                            north: 0.0,
+                            south: -18.5,
+                            east: -68.5,
+                            west: -81.5,
                         },
                         strictBounds: true,
                     }}
@@ -101,7 +104,7 @@ const UbicacionInput: React.FC<Props> = ({ value, position, onChange, onSelect }
                     />
                 </GoogleMap>
             )}
-            <span className="text-xs text-gray-500">Solo se permiten eventos en Lima, Perú</span>
+            <span className="text-xs text-gray-500">Solo se permiten eventos en Perú</span>
         </div>
     );
 };
