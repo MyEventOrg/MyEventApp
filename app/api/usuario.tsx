@@ -31,4 +31,24 @@ const crearUsuario = async (data: CrearUsuarioPayload) => {
     }
 };
 
-export default { iniciarSesion, cerrarSesion, crearUsuario };
+
+const getUsuariosAdmin = async (page: number = 1, search: string = "") => {
+    try {
+        const res = await base.get(`/usuarios?page=${page}&search=${search}`);
+        return res.data;
+    } catch {
+        return { success: false, message: "No se pudieron obtener los usuarios" };
+    }
+};
+
+
+const updateUsuarioEstado = async (id: number, activo: number) => {
+    try {
+        const res = await base.put(`/usuarios/${id}/estado`, { activo });
+        return res.data;
+    } catch {
+        return { success: false, message: "No se pudo actualizar el estado del usuario" };
+    }
+};
+
+export default { iniciarSesion, cerrarSesion, crearUsuario, getUsuariosAdmin, updateUsuarioEstado };
