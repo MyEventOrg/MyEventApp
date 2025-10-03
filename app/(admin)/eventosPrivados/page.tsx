@@ -1,7 +1,5 @@
+import EventosTable from "../components/eventTables";
+
 export default function EventosPrivados() {
-    return (
-        <>
-            <h1>Contenido de Eventos Privados</h1>
-        </>
-    );
+    return <EventosTable title="Eventos Privados" tipo="privados" />;
 }

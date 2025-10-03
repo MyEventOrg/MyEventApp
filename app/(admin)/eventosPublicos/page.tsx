@@ -1,7 +1,5 @@
+import EventosTable from "../components/eventTables";
+
 export default function EventosPublicos() {
-    return (
-        <>
-            <h1>Contenido de Eventos Publicos</h1>
-        </>
-    );
+    return <EventosTable title="Eventos Públicos" tipo="publicos" />;
 }

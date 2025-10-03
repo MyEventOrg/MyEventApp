@@ -21,37 +21,30 @@ export default function Header() {
     return (
         <header className="w-full bg-white border-b border-gray-200 shadow-sm">
             <nav className="flex items-center justify-between px-8 py-3">
-                {/* Logo */}
                 <div
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => router.push("/")}
                 >
                     <img src="/logo.png" alt="Logo" className="w-8 h-8" />
                     <span className="text-primary font-bold text-xl">MyEvent</span>
+                    <span className="text-red-500 font-semibold">ADMIN</span>
                 </div>
 
-                {/* Sección derecha */}
                 <div className="flex items-center gap-6">
-                    {/* Notificaciones */}
                     <img
                         src="/Doorbell.png"
                         alt="Notificaciones"
                         className="w-6 h-6 cursor-pointer"
                     />
-
-                    {/* Usuario */}
                     {isAuthenticated ? (
                         <div className="flex items-center gap-2">
                             <span className="text-gray-800 text-sm">
                                 {user?.apodo}{" "}
-                                <span className="text-red-500 font-semibold">ADMIN</span>
                             </span>
                         </div>
                     ) : (
                         <span className="text-gray-500 text-sm">No has iniciado sesión</span>
                     )}
-
-                    {/* Botón logout */}
                     <button
                         type="button"
                         onClick={handleLogout}

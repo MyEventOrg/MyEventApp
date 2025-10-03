@@ -14,13 +14,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className={`min-h-screen bg-gray-50 ${inriaSans.variable} ${montserrat.variable}
-                    grid grid-rows-[auto_1fr]`}>
+    <div
+      className={`h-screen bg-gray-50 ${inriaSans.variable} ${montserrat.variable}
+                  grid grid-rows-[auto_1fr]`}
+    >
       <Header />
       <div className="grid grid-cols-[16rem_1fr] min-h-0 overflow-hidden">
         <Lateral />
-        <main className="p-6 overflow-y-auto">{children}</main>
+        <main className="px-6 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
 }
+
