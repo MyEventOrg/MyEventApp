@@ -53,27 +53,32 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     const refreshFromCookie = () => {
-        const token = getCookie("token");
-        if (!token) {
-            setUser(null);
-            setLoading(false);
-            return;
-        }
+        setLoading(true);
+        try {
+            const token = getCookie("token");
+            if (!token) {
+                setUser(null);
+                return;
+            }
 
-        const payload = decodeJwt<UserPayload>(token);
-        if (!payload) {
-            setUser(null);
-            setLoading(false);
-            return;
-        }
+            const payload = decodeJwt<UserPayload>(token);
+            if (!payload) {
+                setUser(null);
+                return;
+            }
 
-        const now = Math.floor(Date.now() / 1000);
-        if (payload.exp && now >= payload.exp) {
+            const now = Math.floor(Date.now() / 1000);
+            if (payload.exp && now >= payload.exp) {
+                setUser(null);
+            } else {
+                setUser(payload);
+            }
+        } catch (err) {
+            console.error("Error en refreshFromCookie:", err);
             setUser(null);
-        } else {
-            setUser(payload);
+        } finally {
+            setLoading(false); // ✅ se asegura siempre
         }
-        setLoading(false);
     };
 
     const clearUser = () => setUser(null);
