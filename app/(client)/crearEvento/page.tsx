@@ -11,9 +11,14 @@ import useCategorias from "./hooks/useCategorias";
 import eventoApi from "../../api/evento";
 import { useUser } from "../../context/userContext";
 import Aviso from "../../components/Aviso";
+import uploadApi from "../../api/uploadImg";
+
 export default function CrearEvento() {
     const router = useRouter();
     const { user } = useUser();
+    const [submitting, setSubmitting] = useState(false);
+    const [submitLabel, setSubmitLabel] = useState("Crear Evento");
+
     const [form, setForm] = useState<EventFormData>({
         titulo: "",
         descripcion_corta: "",
@@ -21,20 +26,21 @@ export default function CrearEvento() {
         fecha_evento: "",
         hora: "",
         ubicacion: "",
-        url_imagen: null, // String/null para URLs de imagen
-        url_recurso: null, // File/null para archivos PDF
+        url_imagen: null,
+        url_recurso: null,
         tipo_evento: "publico",
     });
 
+    const [imageFile, setImageFile] = useState<File | null>(null);  
     const [imgPreview, setImgPreview] = useState<string | null>(null);
-    const [selectedPosition, setSelectedPosition] = useState<{ lat: number, lng: number } | null>(null);
+    const [selectedPosition, setSelectedPosition] = useState<{ lat: number; lng: number } | null>(null);
+
     const categorias = useCategorias();
 
-    // 🔔 estado aviso
+    // Avisos
     const [mensajeAviso, setMensajeAviso] = useState("");
     const [visible, setVisible] = useState(false);
     const [tipoAviso, setTipoAviso] = useState<"error" | "exito">("exito");
-
     const showAviso = (texto: string, tipo: "error" | "exito" = "exito") => {
         setMensajeAviso(texto);
         setTipoAviso(tipo);
@@ -42,15 +48,15 @@ export default function CrearEvento() {
         setTimeout(() => setVisible(false), 3000);
     };
 
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
         const target = e.target;
         const { name, value, type } = target;
 
         if (type === "checkbox" && target instanceof HTMLInputElement) {
             setForm((prev) => ({ ...prev, tipo_evento: target.checked ? "privado" : "publico" }));
         } else if (type === "file" && target instanceof HTMLInputElement && name === "url_recurso") {
-            // Solo manejar archivos PDF aquí
             const file = target.files && target.files[0];
             setForm((prev) => ({ ...prev, url_recurso: file || null }));
         } else if (name === "categoria_id") {
@@ -61,9 +67,13 @@ export default function CrearEvento() {
         }
     };
 
-
-    // Ubicacion
-    const handleUbicacionSelect = (lat: number, lng: number, address: string, ciudad?: string, distrito?: string) => {
+    const handleUbicacionSelect = (
+        lat: number,
+        lng: number,
+        address: string,
+        ciudad?: string,
+        distrito?: string
+    ) => {
         setSelectedPosition({ lat, lng });
         setForm((prev) => ({
             ...prev,
@@ -75,38 +85,48 @@ export default function CrearEvento() {
         }));
     };
 
-
-    // Facade para el formulario - Conectado al backend
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        console.log(form)
         e.preventDefault();
 
         try {
-            // Validar que el usuario esté autenticado (todos deben estar registrados)
             if (!user) {
                 showAviso("Error: Usuario no autenticado. Por favor, inicia sesión.", "error");
-
                 router.push("/login");
                 return;
             }
 
-            // Validaciones del frontend
-            const required = ["titulo", "descripcion_corta", "fecha_evento", "hora", "ubicacion"];
+            const required = ["titulo", "descripcion_corta", "fecha_evento", "hora", "ubicacion"] as const;
             for (const key of required) {
-                if (!form[key as keyof EventFormData]) {
+                if (!form[key]) {
                     const label = key.replace("_", " ");
                     showAviso(`El campo ${label} es obligatorio.`, "error");
                     return;
                 }
             }
 
-            // Validación de ubicación
             if (!form.latitud || !form.longitud) {
                 showAviso("Debe seleccionar una ubicación válida en el mapa.", "error");
                 return;
             }
 
-            // Preparar datos para enviar al backend 
+            setSubmitting(true);
+            setSubmitLabel(imageFile ? "Subiendo..." : "Creando...");
+
+            // 1) Subir imagen SOLO ahora (si hay)
+            let urlImagenFinal: string | null = form.url_imagen || null;
+            if (imageFile) {
+                const up = await uploadApi.uploadImagen(imageFile);
+                if (!up?.ok || !up?.url) {
+                    showAviso("No se pudo subir la imagen. Intente nuevamente.", "error");
+                    setSubmitting(false);
+                    setSubmitLabel("Crear Evento");
+                    return;
+                }
+                urlImagenFinal = up.url;
+            }
+
+            // 2) Crear evento
+            setSubmitLabel("Creando...");
             const eventoData = {
                 titulo: form.titulo,
                 descripcion_corta: form.descripcion_corta,
@@ -121,28 +141,25 @@ export default function CrearEvento() {
                 distrito: form.distrito || "",
                 categoria_id: form.categoria_id || null,
                 usuario_id: user.usuario_id,
-                url_imagen: form.url_imagen,
-                url_recurso: form.url_recurso || null // ✅ Incluir el archivo PDF
+                url_imagen: urlImagenFinal,
+                url_recurso: form.url_recurso || null,
             };
-
-            console.log("Enviando datos:", {
-                ...eventoData,
-                url_recurso: form.url_recurso ? form.url_recurso.name : "Sin archivo",
-                url_imagen: form.url_imagen ? "Con imagen" : "Sin imagen"
-            });
 
             const result = await eventoApi.createEvento(eventoData);
 
             if (result.success) {
-                showAviso("Evento creado correctamente", "exito");
-                router.push("/");
+                localStorage.setItem("EventCreadoExito", "Evento creado correctamente");
+                setTimeout(() => router.push("/"), 800);
             } else {
-                showAviso((result.message || "Error desconocido"), "error");
+                showAviso(result.message || "Error desconocido", "error");
+                setSubmitting(false);
+                setSubmitLabel("Crear Evento");
             }
-
         } catch (error) {
             console.error("Error al crear evento:", error);
             showAviso("Error inesperado al crear el evento. Intente nuevamente.", "error");
+            setSubmitting(false);
+            setSubmitLabel("Crear Evento");
         }
     };
 
@@ -167,7 +184,8 @@ export default function CrearEvento() {
                             required
                         />
                     </div>
-                    {/* descrip corta */}
+
+                    {/* descripción corta */}
                     <div>
                         <label className="font-semibold">Descripción Corta*</label>
                         <textarea
@@ -179,7 +197,8 @@ export default function CrearEvento() {
                             required
                         />
                     </div>
-                    {/* descrip larga*/}
+
+                    {/* descripción larga */}
                     <div>
                         <label className="font-semibold">Descripcion Larga*</label>
                         <textarea
@@ -191,6 +210,7 @@ export default function CrearEvento() {
                             required
                         />
                     </div>
+
                     {/* fecha / hora */}
                     <div className="flex gap-4">
                         <div className="flex-1">
@@ -214,29 +234,41 @@ export default function CrearEvento() {
                                 value={form.hora}
                                 onChange={handleChange}
                                 required
-                                min={form.fecha_evento === new Date().toISOString().split("T")[0] ? new Date().toTimeString().slice(0, 5) : undefined}
+                                min={
+                                    form.fecha_evento === new Date().toISOString().split("T")[0]
+                                        ? new Date().toTimeString().slice(0, 5)
+                                        : undefined
+                                }
                             />
                         </div>
                     </div>
-                    {/* campo de ubicacion */}
+
+                    {/* ubicación */}
                     <UbicacionInput
                         value={form.ubicacion}
                         position={selectedPosition}
                         onChange={handleChange}
                         onSelect={handleUbicacionSelect}
                     />
-                    {/* Imagen */}
+
+                    {/* imagen (NO sube en onChange) */}
                     <ImagenUpload
-                        value={form.url_imagen}
-                        onUrlChange={(url) => setForm((prev) => ({ ...prev, url_imagen: url }))}
+                        value={imgPreview || form.url_imagen}
+                        onFileSelect={(file, preview) => {
+                            setImageFile(file);
+                            setImgPreview(preview);
+                        }}
+                        required
                     />
-                    {/* categoria */}
+
+                    {/* categoría */}
                     <CategoriaSelector
                         categorias={categorias}
                         value={form.categoria_id}
                         onChange={handleChange}
                     />
-                    {/* publico/privado */}
+
+                    {/* público/privado */}
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -245,15 +277,16 @@ export default function CrearEvento() {
                             onChange={handleChange}
                             id="privadoCheck"
                         />
-                        <label htmlFor="privadoCheck" className="font-semibold">Evento privado</label>
+                        <label htmlFor="privadoCheck" className="font-semibold">
+                            Evento privado
+                        </label>
                         <span className="ml-2 text-gray-400">{form.tipo_evento === "privado" ? "🔒" : ""}</span>
                     </div>
-                    {/* Recurso */}
-                    <RecursoUpload
-                        value={form.url_recurso ?? null}
-                        onChange={handleChange}
-                    />
-                    {/* Guia */}
+
+                    {/* recurso */}
+                    <RecursoUpload value={form.url_recurso ?? null} onChange={handleChange} />
+
+                    {/* guía */}
                     <div className="bg-gray-100 rounded p-4 text-sm border border-gray-300">
                         <div className="font-semibold mb-2">Información sobre privacidad:</div>
                         <div><b>Eventos públicos:</b> Visibles para todos los usuarios, pueden ser guardados como favoritos.</div>
@@ -261,6 +294,7 @@ export default function CrearEvento() {
                         <div>Los eventos públicos tienen un límite de 100 asistentes</div>
                         <div>Los eventos privados no tienen límite de asistentes</div>
                     </div>
+
                     {/* botones */}
                     <div className="flex gap-4 mt-4">
                         <button
@@ -272,13 +306,25 @@ export default function CrearEvento() {
                         </button>
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                            disabled={submitting}
+                            aria-busy={submitting}
+                            className={`bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700
+              ${submitting ? "opacity-60 cursor-not-allowed hover:bg-blue-600" : "cursor-pointer"}`}
                         >
-                            Crear Evento
+                            <span className="inline-flex items-center gap-2">
+                                {submitting && (
+                                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z" />
+                                    </svg>
+                                )}
+                                {submitLabel}
+                            </span>
                         </button>
                     </div>
                 </form>
             </main>
+
             <Aviso mensaje={mensajeAviso} visible={visible} tipo={tipoAviso} />
         </>
     );

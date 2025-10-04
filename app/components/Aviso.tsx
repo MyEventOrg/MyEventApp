@@ -23,7 +23,7 @@ export default function Aviso({ mensaje, visible, tipo }: AvisoProps) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
                     transition={{ duration: 0.5 }}
-                    className={`${bgColor} fixed top-6 right-6 text-white px-4 py-2 rounded shadow-lg z-[999999] pointer-events-none font-medium`}
+                    className={`${bgColor} fixed bottom-6 right-6 text-white px-4 py-2 rounded shadow-lg z-[999999] pointer-events-none font-medium`}
                 >
                     {mensaje}
                 </motion.div>
