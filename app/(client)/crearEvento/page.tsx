@@ -22,6 +22,7 @@ export default function CrearEvento() {
         hora: "",
         ubicacion: "",
         url_imagen: null,
+        url_recurso: null, // ✅ Agregado
         tipo_evento: "publico",
     });
 
@@ -107,10 +108,14 @@ export default function CrearEvento() {
                 ciudad: form.ciudad || "",
                 distrito: form.distrito || "",
                 categoria_id: form.categoria_id || null,
-                usuario_id: user.usuario_id // Usuario validado arriba (todos registrados)
+                usuario_id: user.usuario_id, // Usuario validado arriba (todos registrados)
+                url_recurso: form.url_recurso || null // ✅ Incluir el archivo PDF
             };
 
-            console.log("Enviando datos:", eventoData);
+            console.log("Enviando datos:", {
+                ...eventoData,
+                url_recurso: form.url_recurso ? form.url_recurso.name : "Sin archivo"
+            });
 
             // Enviar al backend
             const result = await eventoApi.createEvento(eventoData);
