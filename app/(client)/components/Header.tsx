@@ -9,7 +9,7 @@ import { useUser } from "../../context/userContext";
 
 export default function Header() {
     const { user, isAuthenticated, loading } = useUser();
-    
+
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(true);
@@ -109,22 +109,22 @@ export default function Header() {
                 <nav className="mx-auto flex items-center justify-between px-20">
                     <ul className="flex flex-wrap items-center gap-6">
                         <li className={`py-4 ${pathname === "/" ? "border-b-2 border-primary" : ""}`}>
-                            <Link href="/" className={`text-xl text-headertext ${pathname === "/" ? "text-primary" : "hover:text-grayish"}`}>
+                            <Link href="/" className={`text-[1rem] text-headertext ${pathname === "/" ? "text-primary" : "hover:text-grayish"}`}>
                                 Resumen
                             </Link>
                         </li>
                         <li className={`py-4 ${pathname === "/buscarEventos" ? "border-b-2 border-primary" : ""}`}>
-                            <Link href="/buscarEventos" className={`text-xl text-headertext ${pathname === "/buscarEventos" ? "text-primary" : "hover:text-grayish"}`}>
+                            <Link href="/buscarEventos" className={`text-[1rem] text-headertext ${pathname === "/buscarEventos" ? "text-primary" : "hover:text-grayish"}`}>
                                 Buscar Eventos
                             </Link>
                         </li>
                         <li className={`py-4 ${pathname === "/eventosGuardados" ? "border-b-2 border-primary" : ""}`}>
-                            <Link href="/eventosGuardados" className={`text-xl text-headertext ${pathname === "/eventosGuardados" ? "text-primary" : "hover:text-grayish"}`}>
+                            <Link href="/eventosGuardados" className={`text-[1rem] text-headertext ${pathname === "/eventosGuardados" ? "text-primary" : "hover:text-grayish"}`}>
                                 Eventos Guardados
                             </Link>
                         </li>
                         <li className={`py-4 ${pathname === "/eventosAsistidos" ? "border-b-2 border-primary" : ""}`}>
-                            <Link href="/eventosAsistidos" className={`text-xl text-headertext ${pathname === "/eventosAsistidos" ? "text-primary" : "hover:text-grayish"}`}>
+                            <Link href="/eventosAsistidos" className={`text-[1rem] text-headertext ${pathname === "/eventosAsistidos" ? "text-primary" : "hover:text-grayish"}`}>
                                 Eventos a los que asistió
                             </Link>
                         </li>
