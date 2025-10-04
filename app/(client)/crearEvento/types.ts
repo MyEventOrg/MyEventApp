@@ -5,7 +5,7 @@ export interface EventFormData {
     fecha_evento: string;
     hora: string;
     ubicacion: string;
-    url_imagen: File | null;
+    url_imagen: string;
     tipo_evento: string;
     latitud?: number;
     longitud?: number;

@@ -55,10 +55,12 @@ export default function EventoModal({ isOpen, onClose, evento }: EventoModalProp
 
                         <div className="relative">
                             <img
-                                src={evento?.url_imagen}
+                                src={`${evento?.url_imagen}?t=${new Date(evento?.fecha_creacion_evento).getTime()}`}
                                 alt={evento?.titulo}
                                 className="w-full h-full object-cover"
                             />
+
+
                             <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white p-4">
                                 <h2 className="text-2xl font-bold">{evento?.titulo}</h2>
                                 <p className="text-sm italic">{evento?.descripcion_corta}</p>
