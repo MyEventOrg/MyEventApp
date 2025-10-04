@@ -6,7 +6,6 @@ type UserPayload = {
     apodo: string;
     rol: "user" | "admin" | string;
     iat: number;
-    exp: number;
 };
 
 type UserContextType = {
@@ -67,19 +66,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 return;
             }
 
-            const now = Math.floor(Date.now() / 1000);
-            if (payload.exp && now >= payload.exp) {
-                setUser(null);
-            } else {
-                setUser(payload);
-            }
+            setUser(payload);
+
         } catch (err) {
             console.error("Error en refreshFromCookie:", err);
             setUser(null);
         } finally {
-            setLoading(false); // ✅ se asegura siempre
+            setLoading(false);
         }
     };
+
 
     const clearUser = () => setUser(null);
 

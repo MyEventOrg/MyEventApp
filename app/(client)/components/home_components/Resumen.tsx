@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "../../../context/userContext";
 import StatsCard from "./StatsCards";
 import eventoApi from "../../../api/resumen";
+import UpcomingCarousel from "./UpcomingCarousel";
 
 type Totals = { creados: number; asistiendo: number; guardados: number };
 
@@ -40,61 +41,70 @@ export default function ResumenPage() {
     }, [isAuthenticated, user?.usuario_id, userLoading]);
 
     return (
-        <div className="flex flex-wrap justify-between">
-            {loading ? (
-                <>
-                    <div className="w-[331px] h-[114px] bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-4 flex items-center gap-3 animate-pulse">
-                        <div className="w-10 h-10 rounded-xl bg-gray-200" />
-                        <div className="flex flex-col gap-2">
-                            <div className="h-3 w-24 bg-gray-200 rounded" />
-                            <div className="h-6 w-12 bg-gray-200 rounded" />
+        <>
+            <div className="flex flex-wrap justify-between">
+                {loading ? (
+                    <>
+                        <div className="w-[331px] h-[114px] bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-4 flex items-center gap-3 animate-pulse">
+                            <div className="w-10 h-10 rounded-xl bg-gray-200" />
+                            <div className="flex flex-col gap-2">
+                                <div className="h-3 w-24 bg-gray-200 rounded" />
+                                <div className="h-6 w-12 bg-gray-200 rounded" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="w-[331px] h-[114px] bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-4 flex items-center gap-3 animate-pulse">
-                        <div className="w-10 h-10 rounded-xl bg-gray-200" />
-                        <div className="flex flex-col gap-2">
-                            <div className="h-3 w-24 bg-gray-200 rounded" />
-                            <div className="h-6 w-12 bg-gray-200 rounded" />
+                        <div className="w-[331px] h-[114px] bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-4 flex items-center gap-3 animate-pulse">
+                            <div className="w-10 h-10 rounded-xl bg-gray-200" />
+                            <div className="flex flex-col gap-2">
+                                <div className="h-3 w-24 bg-gray-200 rounded" />
+                                <div className="h-6 w-12 bg-gray-200 rounded" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="w-[331px] h-[114px] bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-4 flex items-center gap-3 animate-pulse">
-                        <div className="w-10 h-10 rounded-xl bg-gray-200" />
-                        <div className="flex flex-col gap-2">
-                            <div className="h-3 w-24 bg-gray-200 rounded" />
-                            <div className="h-6 w-12 bg-gray-200 rounded" />
+                        <div className="w-[331px] h-[114px] bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-4 flex items-center gap-3 animate-pulse">
+                            <div className="w-10 h-10 rounded-xl bg-gray-200" />
+                            <div className="flex flex-col gap-2">
+                                <div className="h-3 w-24 bg-gray-200 rounded" />
+                                <div className="h-6 w-12 bg-gray-200 rounded" />
+                            </div>
                         </div>
-                    </div>
 
-                </>
-            ) : (
-                <>
-                    <StatsCard
-                        title="Mis Eventos"
-                        value={totals.creados}
-                        icon="calendar"
-                        href="/misEventos"
-                        numberClass="text-gray-900"
-                        iconClass="text-indigo-700"
-                    />
-                    <StatsCard
-                        title="Asistiendo"
-                        value={totals.asistiendo}
-                        icon="users"
-                        href="/eventosAsistidos"
-                        numberClass="text-green-600"
-                        iconClass="text-green-500"
-                    />
-                    <StatsCard
-                        title="Guardados"
-                        value={totals.guardados}
-                        icon="megaphone"
-                        href="/eventosGuardados"
-                        numberClass="text-yellow-600"
-                        iconClass="text-yellow-500"
-                    />
-                </>
-            )}
-        </div>
-
+                    </>
+                ) : (
+                    <>
+                        <StatsCard
+                            title="Mis Eventos"
+                            value={totals.creados}
+                            icon="calendar"
+                            href="/misEventos"
+                            numberClass="text-gray-900"
+                            iconClass="text-indigo-700"
+                        />
+                        <StatsCard
+                            title="Asistiendo"
+                            value={totals.asistiendo}
+                            icon="users"
+                            href="/eventosAsistidos"
+                            numberClass="text-green-600"
+                            iconClass="text-green-500"
+                        />
+                        <StatsCard
+                            title="Guardados"
+                            value={totals.guardados}
+                            icon="megaphone"
+                            href="/eventosGuardados"
+                            numberClass="text-yellow-600"
+                            iconClass="text-yellow-500"
+                        />
+                    </>
+                )}
+            </div>
+            <div className="flex flex-col mt-12 items-start gap-3 bg-white rounded-[20px] border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] px-8 py-4">
+                <h1 className="text-2xl">Próximos eventos</h1>
+                {isAuthenticated && user?.usuario_id ? (
+                    <UpcomingCarousel usuarioId={user.usuario_id} />
+                ) : (
+                    <div className="text-sm text-gray-500">Inicia sesión para ver tus próximos eventos.</div>
+                )}
+            </div>
+        </>
     );
 }
