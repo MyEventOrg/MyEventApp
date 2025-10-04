@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import EventoApi from "../../api/eventoo";
+import EventoApi from "../../api/evento";
 
 interface Evento {
     evento_id: number;
@@ -54,10 +54,9 @@ export default function EventoGestionModal({ isOpen, onClose, evento, onAfterUpd
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                     >
-                        {/* Botón cerrar */}
                         <button
                             onClick={onClose}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-lg font-bold"
+                            className="absolute cursor-pointer top-2 right-2 text-gray-500 hover:text-red-500 text-lg font-bold"
                         >
                             ✕
                         </button>

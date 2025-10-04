@@ -8,7 +8,7 @@ import ImagenUpload from "./components/ImagenUpload";
 import RecursoUpload from "./components/RecursoUpload";
 import UbicacionInput from "./components/UbicacionInput";
 import useCategorias from "./hooks/useCategorias";
-import eventoApi from "../../api/eventoo";
+import eventoApi from "../../api/evento";
 import { useUser } from "../../context/userContext";
 
 export default function CrearEvento() {

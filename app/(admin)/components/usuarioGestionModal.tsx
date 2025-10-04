@@ -57,7 +57,7 @@ export default function UsuarioGestionModal({
                     >
                         <button
                             onClick={onClose}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-lg font-bold"
+                            className="absolute cursor-pointer top-2 right-2 text-gray-500 hover:text-red-500 text-lg font-bold"
                         >
                             ✕
                         </button>

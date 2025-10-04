@@ -81,18 +81,18 @@ export default function GestionUsuarios() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
-                    <table className="w-full bg-white text-sm text-center">
-                        <thead className="bg-[#3F78A1] text-white">
+                <div className="rounded-lg shadow-md border border-gray-200 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-auto">
+                    <table className="w-full table-fixed bg-white text-sm [&_th]:align-middle [&_td]:align-middle">
+                        <thead className="bg-[#3F78A1] text-white sticky top-0 z-10">
                             <tr>
-                                <th className="px-2 py-2">#</th>
-                                <th className="px-2 py-2">Acciones</th>
-                                <th className="px-2 py-2">Nombre Completo</th>
-                                <th className="px-2 py-2">Correo</th>
-                                <th className="px-2 py-2">Fecha Registro</th>
-                                <th className="px-2 py-2">Activo</th>
-                                <th className="px-2 py-2">Rol</th>
-                                <th className="px-2 py-2">Apodo</th>
+                                <th className="px-2 py-2 w-[50px]">#</th>
+                                <th className="px-2 py-2 w-[120px]">Acciones</th>
+                                <th className="px-2 py-2 w-[250px]">Nombre Completo</th>
+                                <th className="px-2 py-2 w-[250px]">Correo</th>
+                                <th className="px-2 py-2 w-[150px]">Fecha Registro</th>
+                                <th className="px-2 py-2 w-[100px]">Activo</th>
+                                <th className="px-2 py-2 w-[120px]">Rol</th>
+                                <th className="px-2 py-2 w-[150px]">Apodo</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,8 +120,10 @@ export default function GestionUsuarios() {
                                                 Gestionar
                                             </button>
                                         </td>
-                                        <td className="px-2 py-2 font-medium">{usuario.nombreCompleto}</td>
-                                        <td className="px-2 py-2">{usuario.correo}</td>
+                                        <td className="px-2 py-2 font-medium break-words">
+                                            {usuario.nombreCompleto}
+                                        </td>
+                                        <td className="px-2 py-2 break-words">{usuario.correo}</td>
                                         <td className="px-2 py-2">
                                             {new Date(usuario.fecha_registro).toLocaleDateString()}
                                         </td>
@@ -138,7 +140,6 @@ export default function GestionUsuarios() {
                                         </td>
                                         <td className="px-2 py-2">{usuario.rol}</td>
                                         <td className="px-2 py-2">{usuario.apodo}</td>
-
                                     </tr>
                                 ))
                             ) : (
@@ -152,6 +153,7 @@ export default function GestionUsuarios() {
                     </table>
                 </div>
             </div>
+
             <UsuarioGestionModal
                 isOpen={isGestionModalOpen}
                 onClose={() => setIsGestionModalOpen(false)}
