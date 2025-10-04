@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 
 interface Props {
   email: string;
+  showAviso: (texto: string, tipo: string) => void;
 }
 
-export default function Formulario({ email }: Props) {
+export default function Formulario({ email, showAviso }: Props) {
   const [nombres, setNombres] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [apodo, setApodo] = useState("");
@@ -16,11 +17,12 @@ export default function Formulario({ email }: Props) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      showAviso("Las contraseñas no coinciden", "error");
       return;
     }
 
@@ -35,13 +37,15 @@ export default function Formulario({ email }: Props) {
       });
 
       if (res.success) {
-        alert("Cuenta creada con éxito :D");
+        localStorage.setItem("toastMessage", "Cuenta creada con éxito");
         router.push("/login");
-      } else {
-        alert(res.message || "No se pudo crear la cuenta");
       }
+      else {
+        showAviso(res.message || "No se pudo crear la cuenta", "error");
+      }
+
     } catch (error) {
-      alert("Error de conexión con el servidor");
+      showAviso("Error de conexión con el servidor", "error");
     } finally {
       setLoading(false);
     }

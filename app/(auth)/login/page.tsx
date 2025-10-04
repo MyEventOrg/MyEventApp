@@ -1,47 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import UsuarioApi from "../../api/usuario";
+import Aviso from "../../components/Aviso";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [mensaje, setMensaje] = useState<string | null>(null);
+
+    const [mensajeAviso, setMensajeAviso] = useState("");
+    const [visible, setVisible] = useState(false);
+    const [tipo, setTipo] = useState<"error" | "exito">("exito");
+
     const router = useRouter();
+
+    const showAviso = (texto: string, tipo: "error" | "exito" = "exito") => {
+        setMensajeAviso(texto);
+        setTipo(tipo);
+        setVisible(true);
+        setTimeout(() => setVisible(false), 3000);
+    };
+
+    useEffect(() => {
+        const msg = localStorage.getItem("toastMessage");
+        if (msg) {
+            showAviso(msg, "exito");
+            localStorage.removeItem("toastMessage");
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setMensaje(null);
         setLoading(true);
 
         try {
             const resp = await UsuarioApi.iniciarSesion({ email, password });
+
             if (resp?.success) {
-                //el middleware hace toda la logicaaa
+                //middleware hace la logica...
                 window.location.reload();
                 return;
             }
-            setMensaje(resp?.message || "Credenciales inválidas");
+
+            showAviso(resp?.message || "Credenciales inválidas", "error");
         } catch {
-            setMensaje("Error de conexión con el servidor");
+            showAviso("Error de conexión con el servidor", "error");
         } finally {
             setLoading(false);
         }
     };
 
-
     return (
         <>
             <div className="flex flex-col items-center mb-6">
-                <img
-                    src="/logo.png"
-                    alt="Logo MyEvent"
-                    className="w-40 h-40 rounded-lg p-2"
-                />
+                <img src="/logo.png" alt="Logo MyEvent" className="w-40 h-40 rounded-lg p-2" />
                 <h1 className="text-2xl font-bold text-[#2c4a68] mt-4">MyEvent</h1>
                 <p className="text-gray-700">Inicia sesión en tu cuenta</p>
             </div>
@@ -74,13 +90,9 @@ export default function LoginPage() {
                         aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                         title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                     >
-                        {showPassword ? "🙈" : "👁"}
+                        {showPassword ? "Ocultar" : "Ver"}
                     </button>
                 </div>
-
-                {mensaje && (
-                    <p className="text-sm text-red-600">{mensaje}</p>
-                )}
 
                 <button
                     type="submit"
@@ -97,6 +109,9 @@ export default function LoginPage() {
                     Regístrate aquí
                 </Link>
             </p>
+
+            {/* ✅ Aviso global */}
+            <Aviso mensaje={mensajeAviso} visible={visible} tipo={tipo} />
         </>
     );
 }

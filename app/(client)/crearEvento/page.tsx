@@ -10,7 +10,7 @@ import UbicacionInput from "./components/UbicacionInput";
 import useCategorias from "./hooks/useCategorias";
 import eventoApi from "../../api/evento";
 import { useUser } from "../../context/userContext";
-
+import Aviso from "../../components/Aviso";
 export default function CrearEvento() {
     const router = useRouter();
     const { user } = useUser();
@@ -29,6 +29,19 @@ export default function CrearEvento() {
     const [imgPreview, setImgPreview] = useState<string | null>(null);
     const [selectedPosition, setSelectedPosition] = useState<{ lat: number, lng: number } | null>(null);
     const categorias = useCategorias();
+
+    // 🔔 estado aviso
+    const [mensajeAviso, setMensajeAviso] = useState("");
+    const [visible, setVisible] = useState(false);
+    const [tipoAviso, setTipoAviso] = useState<"error" | "exito">("exito");
+
+    const showAviso = (texto: string, tipo: "error" | "exito" = "exito") => {
+        setMensajeAviso(texto);
+        setTipoAviso(tipo);
+        setVisible(true);
+        setTimeout(() => setVisible(false), 3000);
+    };
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = e.target;
@@ -71,7 +84,8 @@ export default function CrearEvento() {
         try {
             // Validar que el usuario esté autenticado (todos deben estar registrados)
             if (!user) {
-                alert("Error: Usuario no autenticado. Por favor, inicia sesión.");
+                showAviso("Error: Usuario no autenticado. Por favor, inicia sesión.", "error");
+
                 router.push("/login");
                 return;
             }
@@ -80,14 +94,15 @@ export default function CrearEvento() {
             const required = ["titulo", "descripcion_corta", "fecha_evento", "hora", "ubicacion"];
             for (const key of required) {
                 if (!form[key as keyof EventFormData]) {
-                    alert(`El campo ${key.replace('_', ' ')} es obligatorio.`);
+                    const label = key.replace("_", " ");
+                    showAviso(`El campo ${label} es obligatorio.`, "error");
                     return;
                 }
             }
 
             // Validación de ubicación
             if (!form.latitud || !form.longitud) {
-                alert("Debe seleccionar una ubicación válida en el mapa.");
+                showAviso("Debe seleccionar una ubicación válida en el mapa.", "error");
                 return;
             }
 
@@ -119,15 +134,15 @@ export default function CrearEvento() {
             const result = await eventoApi.createEvento(eventoData);
 
             if (result.success) {
-                alert("Evento creado correctamente.");
+                showAviso("Evento creado correctamente", "exito");
                 router.push("/");
             } else {
-                alert("Error al crear evento: " + (result.message || "Error desconocido"));
+                showAviso((result.message || "Error desconocido"), "error");
             }
 
         } catch (error) {
             console.error("Error al crear evento:", error);
-            alert("Error inesperado al crear el evento. Intente nuevamente.");
+            showAviso("Error inesperado al crear el evento. Intente nuevamente.", "error");
         }
     };
 
@@ -264,6 +279,7 @@ export default function CrearEvento() {
                     </div>
                 </form>
             </main>
+            <Aviso mensaje={mensajeAviso} visible={visible} tipo={tipoAviso} />
         </>
     );
 }

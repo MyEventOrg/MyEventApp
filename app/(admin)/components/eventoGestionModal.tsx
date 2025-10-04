@@ -1,13 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import EventoApi from "../../api/evento";
 
 interface Evento {
     evento_id: number;
     titulo: string;
-    estado_evento: string;
+    estado_evento: "pendiente" | "activo" | "rechazado" | string;
 }
 
 interface EventoGestionModalProps {
@@ -17,24 +17,38 @@ interface EventoGestionModalProps {
     onAfterUpdate?: () => void;
 }
 
-export default function EventoGestionModal({ isOpen, onClose, evento, onAfterUpdate }: EventoGestionModalProps) {
-    const estadosDisponibles = ["pendiente", "activo", "rechazado"];
-    const [nuevoEstado, setNuevoEstado] = useState(evento?.estado_evento || "");
+export default function EventoGestionModal({
+    isOpen,
+    onClose,
+    evento,
+    onAfterUpdate,
+}: EventoGestionModalProps) {
+    const estadosDisponibles = ["pendiente", "activo", "rechazado"] as const;
+
+    const [nuevoEstado, setNuevoEstado] = useState<string>(
+        evento?.estado_evento ?? estadosDisponibles[0]
+    );
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setNuevoEstado(evento?.estado_evento ?? estadosDisponibles[0]);
+    }, [evento]);
 
     const handleConfirm = async () => {
         if (!evento) return;
-        setLoading(true);
-
-        const res = await EventoApi.updateEstadoEvento(evento.evento_id, nuevoEstado);
-
-        setLoading(false);
-
-        if (res.success) {
-            if (onAfterUpdate) onAfterUpdate();
-            onClose();
-        } else {
+        try {
+            setLoading(true);
+            const res = await EventoApi.updateEstadoEvento(evento.evento_id, nuevoEstado);
+            if (res.success) {
+                onAfterUpdate?.();
+                onClose();
+            } else {
+                alert(res.message || "Error al actualizar el estado");
+            }
+        } catch (e) {
             alert("Error al actualizar el estado");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -57,6 +71,7 @@ export default function EventoGestionModal({ isOpen, onClose, evento, onAfterUpd
                         <button
                             onClick={onClose}
                             className="absolute cursor-pointer top-2 right-2 text-gray-500 hover:text-red-500 text-lg font-bold"
+                            aria-label="Cerrar"
                         >
                             ✕
                         </button>
@@ -96,6 +111,7 @@ export default function EventoGestionModal({ isOpen, onClose, evento, onAfterUpd
                                 </option>
                             ))}
                         </select>
+
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={onClose}

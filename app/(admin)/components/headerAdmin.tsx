@@ -3,11 +3,12 @@
 import { useRouter } from "next/navigation";
 import UsuarioApi from "../../api/usuario";
 import { useUser } from "../../context/userContext";
-
+import Advice from "../../components/Advice";
+import { useState } from "react";
 export default function Header() {
     const { user, isAuthenticated } = useUser();
     const router = useRouter();
-
+    const [open, setOpen] = useState(false);
     const handleLogout = async () => {
         try {
             await UsuarioApi.cerrarSesion();
@@ -44,11 +45,17 @@ export default function Header() {
                     )}
                     <button
                         type="button"
-                        onClick={handleLogout}
+                        onClick={() => setOpen(true)}
                         className="text-sm cursor-pointer text-gray-600 hover:text-red-500 transition-colors"
                     >
                         Cerrar Sesión
                     </button>
+                    <Advice
+                        isOpen={open}
+                        message="¿Estás seguro que desea salir?"
+                        onConfirm={handleLogout}
+                        onClose={() => setOpen(false)}
+                    />
                 </div>
             </nav>
         </header>
