@@ -13,7 +13,7 @@ import { useUser } from "../../context/userContext";
 
 export default function CrearEvento() {
     const router = useRouter();
-    const { user } = useUser(); // Obtener usuario del contexto
+    const { user } = useUser();
     const [form, setForm] = useState<EventFormData>({
         titulo: "",
         descripcion_corta: "",
@@ -21,37 +21,33 @@ export default function CrearEvento() {
         fecha_evento: "",
         hora: "",
         ubicacion: "",
-        url_imagen: null,
-        url_recurso: null, // ✅ Agregado
+        url_imagen: null, // String/null para URLs de imagen
+        url_recurso: null, // File/null para archivos PDF
         tipo_evento: "publico",
     });
 
     const [imgPreview, setImgPreview] = useState<string | null>(null);
-    const [selectedPosition, setSelectedPosition] = useState<{lat: number, lng: number} | null>(null);
+    const [selectedPosition, setSelectedPosition] = useState<{ lat: number, lng: number } | null>(null);
     const categorias = useCategorias();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = e.target;
         const { name, value, type } = target;
-        
+
         if (type === "checkbox" && target instanceof HTMLInputElement) {
             setForm((prev) => ({ ...prev, tipo_evento: target.checked ? "privado" : "publico" }));
-        } else if (type === "file" && target instanceof HTMLInputElement) {
+        } else if (type === "file" && target instanceof HTMLInputElement && name === "url_recurso") {
+            // Solo manejar archivos PDF aquí
             const file = target.files && target.files[0];
-            if (name === "url_imagen" && file) {
-                setForm((prev) => ({ ...prev, url_imagen: file }));
-                setImgPreview(URL.createObjectURL(file));
-            } else if (name === "url_recurso" && file) {
-                setForm((prev) => ({ ...prev, url_recurso: file }));
-            }
+            setForm((prev) => ({ ...prev, url_recurso: file || null }));
         } else if (name === "categoria_id") {
-            // Manejo específico para categoría
             const categoriaId = value ? Number(value) : undefined;
             setForm((prev) => ({ ...prev, categoria_id: categoriaId }));
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
         }
     };
+
 
     // Ubicacion
     const handleUbicacionSelect = (lat: number, lng: number, address: string, ciudad?: string, distrito?: string) => {
@@ -69,8 +65,9 @@ export default function CrearEvento() {
 
     // Facade para el formulario - Conectado al backend
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        console.log(form)
         e.preventDefault();
-        
+
         try {
             // Validar que el usuario esté autenticado (todos deben estar registrados)
             if (!user) {
@@ -108,21 +105,22 @@ export default function CrearEvento() {
                 ciudad: form.ciudad || "",
                 distrito: form.distrito || "",
                 categoria_id: form.categoria_id || null,
-                usuario_id: user.usuario_id, // Usuario validado arriba (todos registrados)
+                usuario_id: user.usuario_id,
+                url_imagen: form.url_imagen,
                 url_recurso: form.url_recurso || null // ✅ Incluir el archivo PDF
             };
 
             console.log("Enviando datos:", {
                 ...eventoData,
-                url_recurso: form.url_recurso ? form.url_recurso.name : "Sin archivo"
+                url_recurso: form.url_recurso ? form.url_recurso.name : "Sin archivo",
+                url_imagen: form.url_imagen ? "Con imagen" : "Sin imagen"
             });
 
-            // Enviar al backend
             const result = await eventoApi.createEvento(eventoData);
 
             if (result.success) {
                 alert("Evento creado correctamente.");
-                router.push("/"); // Redirigir a la página principal
+                router.push("/");
             } else {
                 alert("Error al crear evento: " + (result.message || "Error desconocido"));
             }
@@ -201,7 +199,7 @@ export default function CrearEvento() {
                                 value={form.hora}
                                 onChange={handleChange}
                                 required
-                                min={form.fecha_evento === new Date().toISOString().split("T")[0] ? new Date().toTimeString().slice(0,5) : undefined}
+                                min={form.fecha_evento === new Date().toISOString().split("T")[0] ? new Date().toTimeString().slice(0, 5) : undefined}
                             />
                         </div>
                     </div>
@@ -215,8 +213,7 @@ export default function CrearEvento() {
                     {/* Imagen */}
                     <ImagenUpload
                         value={form.url_imagen}
-                        onChange={handleChange}
-                        preview={imgPreview}
+                        onUrlChange={(url) => setForm((prev) => ({ ...prev, url_imagen: url }))}
                     />
                     {/* categoria */}
                     <CategoriaSelector
