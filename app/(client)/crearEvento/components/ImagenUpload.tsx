@@ -20,9 +20,31 @@ const ImagenUpload: React.FC<Props> = ({ value, onFileSelect, required }) => {
             return;
         }
 
-        // (Opcional) Validaciones:
-        // if (!/^image\//.test(file.type)) return;
-        // if (file.size > 2 * 1024 * 1024) return; // 2MB
+        // Validaciones estrictas para imágenes
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)');
+            e.target.value = ''; // Limpiar el input
+            return;
+        }
+
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            alert('La imagen no puede ser mayor a 5MB');
+            e.target.value = ''; // Limpiar el input
+            return;
+        }
+
+        // Validar extensión del archivo
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+        const fileName = file.name.toLowerCase();
+        const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+        
+        if (!hasValidExtension) {
+            alert('El archivo debe tener una extensión de imagen válida (.jpg, .jpeg, .png, .gif, .webp)');
+            e.target.value = ''; // Limpiar el input
+            return;
+        }
 
         setFileName(file.name);
         const reader = new FileReader();
@@ -70,7 +92,7 @@ const ImagenUpload: React.FC<Props> = ({ value, onFileSelect, required }) => {
                         id="imagen-upload"
                         type="file"
                         name="url_imagen"
-                        accept="image/png, image/jpeg, image/jpg, image/gif"
+                        accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp"
                         onChange={handleSelectFile}
                         required={required}
                         style={{ display: "none" }}
