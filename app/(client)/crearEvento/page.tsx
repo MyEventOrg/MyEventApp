@@ -95,13 +95,41 @@ export default function CrearEvento() {
                 return;
             }
 
-            const required = ["titulo", "descripcion_corta", "fecha_evento", "hora", "ubicacion"] as const;
+            const required = ["titulo", "descripcion_corta", "descripcion_larga", "fecha_evento", "hora", "ubicacion"] as const;
             for (const key of required) {
                 if (!form[key]) {
                     const label = key.replace("_", " ");
                     showAviso(`El campo ${label} es obligatorio.`, "error");
                     return;
                 }
+            }
+
+            // Validaciones de longitud específicas
+            if (form.titulo.trim().length < 3) {
+                showAviso("El título debe tener al menos 3 caracteres.", "error");
+                return;
+            }
+            if (form.titulo.length > 60) {
+                showAviso("El título no puede exceder 60 caracteres.", "error");
+                return;
+            }
+
+            if (form.descripcion_corta.trim().length < 10) {
+                showAviso("La descripción corta debe tener al menos 10 caracteres.", "error");
+                return;
+            }
+            if (form.descripcion_corta.length > 200) {
+                showAviso("La descripción corta no puede exceder 200 caracteres.", "error");
+                return;
+            }
+
+            if (form.descripcion_larga.trim().length < 25) {
+                showAviso("La descripción larga debe tener al menos 25 caracteres.", "error");
+                return;
+            }
+            if (form.descripcion_larga.length > 1000) {
+                showAviso("La descripción larga no puede exceder 1000 caracteres.", "error");
+                return;
             }
 
             if (!form.latitud || !form.longitud) {
@@ -173,42 +201,81 @@ export default function CrearEvento() {
                 >
                     {/* nombre */}
                     <div>
-                        <label className="font-semibold">Nombre del Evento*</label>
+                        <div className="flex justify-between items-center">
+                            <label className="font-semibold">Nombre del Evento*</label>
+                            <span className={`text-sm ${
+                                form.titulo.length > 60 ? 'text-red-500' : 
+                                form.titulo.length < 3 ? 'text-gray-400' : 'text-green-600'
+                            }`}>
+                                {form.titulo.length}/60
+                            </span>
+                        </div>
                         <input
                             type="text"
                             name="titulo"
-                            placeholder="Ej: Conferencia de Tecnologia 2024"
-                            className="mt-2 w-full p-2 border rounded focus:outline-none"
+                            placeholder="Ej: Conferencia de Tecnología 2024"
+                            className={`mt-2 w-full p-2 border rounded focus:outline-none ${
+                                form.titulo.length > 60 ? 'border-red-500' : ''
+                            }`}
                             value={form.titulo}
                             onChange={handleChange}
                             required
                         />
+                        {form.titulo.length < 3 && form.titulo.length > 0 && (
+                            <p className="text-red-500 text-sm mt-1">Mínimo 3 caracteres</p>
+                        )}
                     </div>
 
                     {/* descripción corta */}
                     <div>
-                        <label className="font-semibold">Descripción Corta*</label>
+                        <div className="flex justify-between items-center">
+                            <label className="font-semibold">Descripción Corta*</label>
+                            <span className={`text-sm ${
+                                form.descripcion_corta.length > 200 ? 'text-red-500' : 
+                                form.descripcion_corta.length < 10 ? 'text-gray-400' : 'text-green-600'
+                            }`}>
+                                {form.descripcion_corta.length}/200
+                            </span>
+                        </div>
                         <textarea
                             name="descripcion_corta"
-                            placeholder="Describe tu evento en detalle..."
-                            className="mt-2 w-full p-2 border rounded focus:outline-none"
+                            placeholder="Describe brevemente tu evento (mínimo 10 caracteres)..."
+                            className={`mt-2 w-full p-2 border rounded focus:outline-none h-20 resize-none ${
+                                form.descripcion_corta.length > 200 ? 'border-red-500' : ''
+                            }`}
                             value={form.descripcion_corta}
                             onChange={handleChange}
                             required
                         />
+                        {form.descripcion_corta.length < 10 && form.descripcion_corta.length > 0 && (
+                            <p className="text-red-500 text-sm mt-1">Mínimo 10 caracteres (faltan {10 - form.descripcion_corta.length})</p>
+                        )}
                     </div>
 
                     {/* descripción larga */}
                     <div>
-                        <label className="font-semibold">Descripcion Larga*</label>
+                        <div className="flex justify-between items-center">
+                            <label className="font-semibold">Descripción Larga*</label>
+                            <span className={`text-sm ${
+                                form.descripcion_larga.length > 1000 ? 'text-red-500' : 
+                                form.descripcion_larga.length < 25 ? 'text-gray-400' : 'text-green-600'
+                            }`}>
+                                {form.descripcion_larga.length}/1000
+                            </span>
+                        </div>
                         <textarea
                             name="descripcion_larga"
-                            placeholder="Describe tu evento..."
-                            className="mt-2 w-full p-2 border rounded focus:outline-none"
+                            placeholder="Describe tu evento en detalle (mínimo 25 caracteres)..."
+                            className={`mt-2 w-full p-2 border rounded focus:outline-none h-32 resize-none ${
+                                form.descripcion_larga.length > 1000 ? 'border-red-500' : ''
+                            }`}
                             value={form.descripcion_larga}
                             onChange={handleChange}
                             required
                         />
+                        {form.descripcion_larga.length < 25 && form.descripcion_larga.length > 0 && (
+                            <p className="text-red-500 text-sm mt-1">Mínimo 25 caracteres (faltan {25 - form.descripcion_larga.length})</p>
+                        )}
                     </div>
 
                     {/* fecha / hora */}
