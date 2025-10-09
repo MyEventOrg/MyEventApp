@@ -25,9 +25,10 @@ export default function ResumenPage() {
             try {
                 setLoading(true);
                 const resp = await eventoApi.getResumenMisEventos(user.usuario_id);
-                if (resp?.ok && resp?.totals && active) {
-                    setTotals(resp.totals as Totals);
+                if (resp?.success && resp.data?.totals && active) {
+                    setTotals(resp.data.totals);
                 }
+
             } catch (e) {
                 console.error("Error cargando resumen:", e);
             } finally {

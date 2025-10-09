@@ -11,7 +11,7 @@ type Evento = {
     titulo: string;
     descripcion_corta: string;
     fecha_evento: string;
-    hora: string | null; 
+    hora: string | null;
     tipo_evento: string;
     ubicacion: string | null;
     ciudad?: string | null;
@@ -47,8 +47,8 @@ export default function UpcomingCarousel({ usuarioId }: { usuarioId: number }) {
             try {
                 setLoading(true);
                 const resp = await eventoApi.getResumenMisEventos(usuarioId);
-                const creados: Evento[] = resp?.data?.eventosCreados ?? [];
-                const asist: Evento[] = resp?.data?.eventosAsistiendo ?? [];
+                const creados: Evento[] = resp?.data?.data.eventosCreados ?? [];
+                const asist: Evento[] = resp?.data?.data.eventosAsistiendo ?? [];
 
                 const merged = dedupeById([
                     ...creados.map((e) => ({ ...e, rol: "organizador" as const })),
@@ -145,7 +145,7 @@ export default function UpcomingCarousel({ usuarioId }: { usuarioId: number }) {
                         aria-label="Anterior"
                         onClick={() => go(-1)}
                         disabled={page === 0}
-                        className="rounded-full bg-white border border-gray-200 shadow p-2 disabled:opacity-40"
+                        className="rounded-full cursor-pointer bg-white border border-gray-200 shadow p-2 disabled:opacity-40"
                     >
                         ‹
                     </button>
@@ -187,7 +187,7 @@ export default function UpcomingCarousel({ usuarioId }: { usuarioId: number }) {
                         aria-label="Siguiente"
                         onClick={() => go(1)}
                         disabled={page >= totalPages - 1}
-                        className="rounded-full bg-white border border-gray-200 shadow p-2 disabled:opacity-40"
+                        className="rounded-full cursor-pointer bg-white border border-gray-200 shadow p-2 disabled:opacity-40"
                     >
                         ›
                     </button>

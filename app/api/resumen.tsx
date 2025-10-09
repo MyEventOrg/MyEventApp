@@ -16,25 +16,30 @@ export type EventoLite = {
 };
 
 export type MisEventosResponse = {
-    ok: boolean;
-    usuario_id: number;
-    totals: Totals;
+    success: boolean;
+    message?: string;
     data: {
-        eventosCreados: EventoLite[];
-        eventosAsistiendo: EventoLite[];
-        eventosGuardados: EventoLite[];
+        usuario_id: number;
+        totals: Totals;
+        data: {
+            eventosCreados: EventoLite[];
+            eventosAsistiendo: EventoLite[];
+            eventosGuardados: EventoLite[];
+        };
     };
 };
 
-// OJO: ajusta la ruta al backend real (antes usamos /api/usuarios/:id/mis-eventos)
-const getResumenMisEventos = async (usuarioId: number): Promise<MisEventosResponse> => {
+const getResumenMisEventos = async (
+    usuarioId: number
+): Promise<MisEventosResponse> => {
     const { data } = await base.get<MisEventosResponse>(`/resumen/${usuarioId}`);
     return data;
 };
 
+
 const getResumenTotals = async (usuarioId: number): Promise<Totals> => {
-    const { totals } = await getResumenMisEventos(usuarioId);
-    return totals;
+    const resp = await getResumenMisEventos(usuarioId);
+    return resp.data.totals;
 };
 
 export default { getResumenMisEventos, getResumenTotals };
