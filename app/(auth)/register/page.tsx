@@ -5,7 +5,7 @@ import Link from "next/link";
 import CodigoVerificacion from "./components/codigoverificacion";
 import Formulario from "./components/formulario";
 import NotificacionApi from "../../api/notificacion";
-import Aviso from "../../components/Aviso"; // 👈 componente animado
+import Aviso from "../../components/Aviso";
 
 export default function Register() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -27,19 +27,26 @@ export default function Register() {
     e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!emailRegex.test(cleanEmail)) {
       showAviso("Por favor ingresa un correo válido", "error");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await NotificacionApi.enviarCodigo({ email });
-      if (res.success) {
+      const res = await NotificacionApi.enviarCodigo({ email: cleanEmail });
+      const ok =
+        (typeof res?.success === "boolean" ? res.success : undefined) ??
+        (typeof res?.data?.success === "boolean" ? res.data.success : undefined) ??
+        (res?.status === "success" ? true : undefined) ??
+        false;
+
+      if (ok) {
         setStep(2);
-        showAviso("Código enviado correctamente", "exito");
+        showAviso(res?.message || "Código enviado correctamente", "exito");
       } else {
-        showAviso(res.message || "Error al enviar el código", "error");
+        showAviso(res?.message || "Error al enviar el código", "error");
       }
     } catch {
       showAviso("Error enviando el código", "error");
@@ -47,6 +54,7 @@ export default function Register() {
       setLoading(false);
     }
   };
+
 
   return (
     <>
@@ -65,9 +73,12 @@ export default function Register() {
       <div className="relative w-full h-[300px]">
         <form
           onSubmit={validateEmail}
-          className={`absolute w-full transition-all duration-700 ${step === 1 ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
-            }`}
+          className={`absolute w-full transition-all duration-700 
+    ${step === 1
+              ? "translate-x-0 opacity-100 pointer-events-auto"
+              : "-translate-x-full opacity-0 pointer-events-none"}`}
         >
+
           <input
             type="email"
             placeholder="tu@email.com"
@@ -91,24 +102,26 @@ export default function Register() {
           )}
         </form>
         <div
-          className={`absolute w-full transition-all duration-700 ${step === 2
-            ? "translate-x-0 opacity-100"
-            : step < 2
-              ? "translate-x-full opacity-0"
-              : "-translate-x-full opacity-0"
-            }`}
+          className={`absolute w-full transition-all duration-700 
+    ${step === 2
+              ? "translate-x-0 opacity-100 pointer-events-auto"
+              : step < 2
+                ? "translate-x-full opacity-0 pointer-events-none"
+                : "-translate-x-full opacity-0 pointer-events-none"}`}
         >
           <CodigoVerificacion
-            email={email}
+            email={email.trim().toLowerCase()}
             onVerified={() => setStep(3)}
             showAviso={showAviso}
           />
         </div>
         <div
-          className={`absolute w-full transition-all duration-700 ${step === 3 ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-            }`}
+          className={`absolute w-full transition-all duration-700 
+    ${step === 3
+              ? "translate-x-0 opacity-100 pointer-events-auto"
+              : "translate-x-full opacity-0 pointer-events-none"}`}
         >
-          <Formulario email={email} showAviso={showAviso} />
+          <Formulario email={email.trim().toLowerCase()} showAviso={showAviso} />
         </div>
       </div>
 
