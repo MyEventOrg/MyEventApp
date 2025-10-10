@@ -14,7 +14,7 @@ function getRoleFromToken(token?: string): "admin" | "user" | undefined {
     }
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
     const token = req.cookies.get("token")?.value;
     const role = getRoleFromToken(token);
     const { pathname } = req.nextUrl;
@@ -46,6 +46,29 @@ export function middleware(req: NextRequest) {
             return NextResponse.redirect(url);
         }
         return NextResponse.next();
+    }
+
+    //verificar estado usuario en el backend ---
+    try {
+        const res = await fetch("http://localhost:3001/check-status", {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: "no-store",
+        });
+
+        if (res.status === 401 || res.status === 403) {
+            const response = NextResponse.redirect(new URL("/login", req.url));
+            response.cookies.delete("token");
+            return response;
+        }
+
+        const data = await res.json();
+        if (data?.message === "Usuario inactivo" || data?.data?.activo === false) {
+            const response = NextResponse.redirect(new URL("/login", req.url));
+            response.cookies.delete("token");
+            return response;
+        }
+    } catch (err) {
+        console.error("Error verificando estado del usuario:", err);
     }
 
     // --- CON sesión en páginas de auth ---

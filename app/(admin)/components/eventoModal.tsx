@@ -53,17 +53,16 @@ export default function EventoModal({ isOpen, onClose, evento }: EventoModalProp
                             ✕
                         </button>
 
-                        <div className="relative">
+                        <div className="relative w-full h-full overflow-hidden shadow-lg">
                             <img
                                 src={`${evento?.url_imagen}?t=${new Date(evento?.fecha_creacion_evento).getTime()}`}
                                 alt={evento?.titulo}
-                                className="w-full h-full object-cover"
+                                className="absolute inset-0 w-full h-full object-cover"
                             />
 
-
                             <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white p-4">
-                                <h2 className="text-2xl font-bold">{evento?.titulo}</h2>
-                                <p className="text-sm italic">{evento?.descripcion_corta}</p>
+                                <h2 className="text-2xl font-bold truncate">{evento?.titulo}</h2>
+                                <p className="text-sm italic line-clamp-2">{evento?.descripcion_corta}</p>
                             </div>
                         </div>
 
