@@ -45,6 +45,7 @@ const getUsuariosAdmin = async (page: number = 1, search: string = "") => {
 const updateUsuarioEstado = async (id: number, activo: number) => {
     try {
         const res = await base.put(`/usuarios/${id}/estado`, { activo });
+        console.log(res);
         return res.data;
     } catch {
         return { success: false, message: "No se pudo actualizar el estado del usuario" };
