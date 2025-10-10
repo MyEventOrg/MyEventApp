@@ -107,7 +107,7 @@ export default function EventCard({
     const embedUrl = e.url_direccion?.replace("https://www.google.com/maps?", "https://www.google.com/maps?") + "&z=15&output=embed";
     return (
         <article className={`w-full bg-white rounded-2xl border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] p-4 ${className}`}>
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between cursor-pointer gap-2">
                 <h3 className="font-semibold text-gray-900 line-clamp-1">{e.titulo}</h3>
                 <Eye className="w-4 h-4 text-gray-400" />
             </div>
