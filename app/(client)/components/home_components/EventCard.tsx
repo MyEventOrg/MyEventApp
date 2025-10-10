@@ -53,8 +53,9 @@ function getCoords(e: EventoBase): { lat: number; lng: number } | null {
 
 function buildStaticMapUrl(e: EventoBase) {
     const coords = getCoords(e);
-    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const key = "AIzaSyDdTo8nhURFO9BsyUd0LtaOH9VR7dmCIwM";
     if (!coords || !key) return null;
+
     const { lat, lng } = coords;
     const params = new URLSearchParams({
         center: `${lat},${lng}`,
@@ -63,10 +64,12 @@ function buildStaticMapUrl(e: EventoBase) {
         scale: "2",
         maptype: "roadmap",
         key,
+        markers: `color:red|label:%E2%80%A2|${lat},${lng}`, // punto rojo simple
     }).toString();
-    const markers = `&markers=color:red%7C${lat},${lng}`;
-    return `https://maps.googleapis.com/maps/api/staticmap?${params}${markers}`;
+
+    return `https://maps.googleapis.com/maps/api/staticmap?${params}`;
 }
+
 
 /** Pin rojo relleno (SVG propio para que se vea como en el mock) */
 function MarkerIcon({ className = "" }: { className?: string }) {
@@ -101,7 +104,7 @@ export default function EventCard({
         e.url_direccion ||
         (coords ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}` : undefined);
     const placeLabel = e.ubicacion || e.ciudad || e.distrito || "Ver en Google Maps";
-
+    const embedUrl = e.url_direccion?.replace("https://www.google.com/maps?", "https://www.google.com/maps?") + "&z=15&output=embed";
     return (
         <article className={`w-full bg-white rounded-2xl border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] p-4 ${className}`}>
             <div className="flex items-start justify-between gap-2">
@@ -139,34 +142,52 @@ export default function EventCard({
             </div>
 
             {showMap && (
-                linkToMaps ? (
-                    <a href={linkToMaps} target="_blank" rel="noopener noreferrer" className="block mt-3">
-                        <div className="relative w-full h-[140px] rounded-xl overflow-hidden">
-                            {mapUrl ? (
+                (() => {
+                    const mapStatic = buildStaticMapUrl(e);
+                    return mapStatic && e.url_direccion ? (
+                        <a
+                            href={e.url_direccion}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block mt-3 group"
+                        >
+                            <div className="relative w-full h-[120px] rounded-xl overflow-hidden border shadow-sm transition-transform duration-200 group-hover:scale-[1.01]">
                                 <img
-                                    src={mapUrl}
-                                    alt={`Ubicación de ${e.titulo}`}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
+                                    src={mapStatic}
+                                    alt={`Ubicación de ${e.ubicacion || "evento"}`}
+                                    className="w-full h-full object-cover pointer-events-none select-none"
+                                    draggable={false}
                                 />
-                            ) : (
-                                <div className="w-full h-full bg-gray-100" />
-                            )}
 
-                            <div className="pointer-events-none px-3 pb-3 pt-0 absolute inset-x-3 bottom-0">
-                                <div className="inline-flex max-w-full items-center gap-2 bg-white rounded-full px-3 py-1.5 shadow-md">
-                                    <MarkerIcon className="w-4 h-4 flex-shrink-0" />
-                                    <span className="text-xs md:text-sm font-medium text-gray-800 truncate">{placeLabel}</span>
-                                </div>
+                                {/* Etiqueta centrada */}
+                                {e.ubicacion && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="bg-white/95 text-gray-800 text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1 truncate">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="#ef4444"
+                                                className="w-3.5 h-3.5"
+                                            >
+                                                <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zM12 11.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+                                            </svg>
+                                            <span className="truncate max-w-[90%]">{e.ubicacion}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                        </a>
+                    ) : (
+                        <div className="mt-3 w-full h-[120px] rounded-xl bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                            Sin ubicación
                         </div>
-                    </a>
-                ) : (
-                    <div className="mt-3 w-full h-[140px] rounded-xl bg-gray-100" />
-                )
+                    );
+                })()
             )}
 
-            <div className="mt-3 flex items-center gap-2">
+
+
+            <div className="mt-3 flex justify-between items-center gap-2 w-full">
                 <span className={`text-xs px-2 py-0.5 rounded-full ${e.tipo_evento === "publico" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                     {e.tipo_evento === "publico" ? "Público" : "Privado"}
                 </span>

@@ -145,8 +145,9 @@ export default function UpcomingCarousel({ usuarioId }: { usuarioId: number }) {
                         aria-label="Anterior"
                         onClick={() => go(-1)}
                         disabled={page === 0}
-                        className="rounded-full cursor-pointer bg-white border border-gray-200 shadow p-2 disabled:opacity-40"
-                    >
+                        className={`rounded-full bg-white border border-gray-200 shadow p-2 transition ${page <= 0
+                            ? "opacity-40 cursor-not-allowed"
+                            : "hover:bg-gray-50 cursor-pointer"}`}                    >
                         ‹
                     </button>
                 </div>
@@ -187,8 +188,9 @@ export default function UpcomingCarousel({ usuarioId }: { usuarioId: number }) {
                         aria-label="Siguiente"
                         onClick={() => go(1)}
                         disabled={page >= totalPages - 1}
-                        className="rounded-full cursor-pointer bg-white border border-gray-200 shadow p-2 disabled:opacity-40"
-                    >
+                        className={`rounded-full bg-white border border-gray-200 shadow p-2 transition ${page >= totalPages - 1
+                            ? "opacity-40 cursor-not-allowed"
+                            : "hover:bg-gray-50 cursor-pointer"}`}                    >
                         ›
                     </button>
                 </div>
