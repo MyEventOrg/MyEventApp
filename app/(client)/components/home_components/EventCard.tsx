@@ -106,12 +106,14 @@ export default function EventCard({
     const placeLabel = e.ubicacion || e.ciudad || e.distrito || "Ver en Google Maps";
     const embedUrl = e.url_direccion?.replace("https://www.google.com/maps?", "https://www.google.com/maps?") + "&z=15&output=embed";
     return (
-        <article className={`w-full bg-white rounded-2xl border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] p-4 ${className}`}>
-            <div className="flex items-start justify-between cursor-pointer gap-2">
+        <article
+            className={`group w-full bg-white rounded-2xl border border-gray-200 shadow-[0_6px_16px_rgba(0,0,0,0.08)] 
+  p-4 transition-transform duration-300 hover:scale-[1.02] cursor-pointer ${className}`}
+        >
+            <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold text-gray-900 line-clamp-1">{e.titulo}</h3>
                 <Eye className="w-4 h-4 text-gray-400" />
             </div>
-
             <p className="text-sm text-gray-600 mt-1 line-clamp-3">{e.descripcion_corta}</p>
             <div className="mt-3 space-y-2 text-sm text-gray-700">
                 <div className="flex items-center gap-2">
@@ -149,9 +151,9 @@ export default function EventCard({
                             href={e.url_direccion}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block mt-3 group"
+                            className="block mt-3"
                         >
-                            <div className="relative w-full h-[120px] rounded-xl overflow-hidden border shadow-sm transition-transform duration-200 group-hover:scale-[1.01]">
+                            <div className="relative w-full h-[120px] rounded-xl overflow-hidden border shadow-sm">
                                 <img
                                     src={mapStatic}
                                     alt={`Ubicación de ${e.ubicacion || "evento"}`}
@@ -159,7 +161,6 @@ export default function EventCard({
                                     draggable={false}
                                 />
 
-                                {/* Etiqueta centrada */}
                                 {e.ubicacion && (
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="bg-white/95 text-gray-800 text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1 truncate">
@@ -184,17 +185,6 @@ export default function EventCard({
                     );
                 })()
             )}
-
-
-
-            <div className="mt-3 flex justify-between items-center gap-2 w-full">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${e.tipo_evento === "publico" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-                    {e.tipo_evento === "publico" ? "Público" : "Privado"}
-                </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${e.rol === "organizador" ? "bg-violet-100 text-violet-700" : "bg-amber-100 text-amber-700"}`}>
-                    {e.rol === "organizador" ? "Organizador" : "Asistente"}
-                </span>
-            </div>
         </article>
     );
 }
