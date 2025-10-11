@@ -115,6 +115,7 @@ export default function EventosTable({ title, tipo }: EventosTableProps) {
                             <tr className="[&_th]:text-center">
                                 <th className="px-2 py-2 w-[50px]">#</th>
                                 <th className="px-2 py-2 w-[180px]">Acciones</th>
+                                <th className="px-2 py-2 w-[150px]">Estado</th>
                                 <th className="px-2 py-2 w-[200px]">Título</th>
                                 <th className="px-2 py-2 w-[300px]">Descripción corta</th>
                                 <th className="px-2 py-2 w-[150px]">Fecha creación</th>
@@ -123,12 +124,11 @@ export default function EventosTable({ title, tipo }: EventosTableProps) {
                                 <th className="px-2 py-2 w-[150px]">Ciudad</th>
                                 <th className="px-2 py-2 w-[150px]">Distrito</th>
                                 <th className="px-2 py-2 w-[200px]">Creado por</th>
-                                <th className="px-2 py-2 w-[150px]">Estado</th>
                                 <th className="px-2 py-2 w-[150px]">Categoría</th>
                             </tr>
                         </thead>
 
-                        <tbody className="[&_td]:text-left">
+                        <tbody className="td:text-left [&_td.estado]:text-center">
                             {loading ? (
                                 <tr>
                                     <td colSpan={12} className="text-start py-4 text-gray-500">
@@ -166,22 +166,9 @@ export default function EventosTable({ title, tipo }: EventosTableProps) {
                                                 </button>
                                             </div>
                                         </td>
-
-                                        <td className="px-2 py-2 font-medium">{evento.titulo}</td>
-                                        <td className="px-2 py-2 break-words">{evento.descripcion_corta}</td>
-                                        <td className="px-2 py-2">
-                                            {new Date(evento.fecha_creacion_evento).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-2 py-2">
-                                            {new Date(evento.fecha_evento).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-2 py-2 break-words">{evento.ubicacion}</td>
-                                        <td className="px-2 py-2">{evento.ciudad}</td>
-                                        <td className="px-2 py-2">{evento.distrito}</td>
-                                        <td className="px-2 py-2">{evento.organizador?.correo ?? "-"}</td>
-                                        <td className="px-2 py-2">
+                                        <td className="px-2 py-2 estado">
                                             <span
-                                                className={`px-2 py-1 rounded text-xs font-semibold ${evento.estado_evento === "pendiente"
+                                                className={`px-2 py-1 rounded text-XL font-semibold ${evento.estado_evento === "pendiente"
                                                     ? "bg-yellow-100 text-yellow-700"
                                                     : evento.estado_evento === "activo"
                                                         ? "bg-green-100 text-green-700"
@@ -193,6 +180,19 @@ export default function EventosTable({ title, tipo }: EventosTableProps) {
                                                 {evento.estado_evento}
                                             </span>
                                         </td>
+                                        <td className="px-2 py-2 font-medium">{evento.titulo}</td>
+                                        <td className="px-2 py-2 break-words">{evento.descripcion_corta}</td>
+                                        <td className="px-2 py-2">
+                                            {evento.fecha_creacion_evento.split("-").reverse().join("/")}
+                                        </td>
+                                        <td className="px-2 py-2">
+                                            {evento.fecha_evento.split("-").reverse().join("/")}
+                                        </td>
+                                        <td className="px-2 py-2 break-words">{evento.ubicacion}</td>
+                                        <td className="px-2 py-2">{evento.ciudad}</td>
+                                        <td className="px-2 py-2">{evento.distrito}</td>
+                                        <td className="px-2 py-2">{evento.organizador?.correo ?? "-"}</td>
+
                                         <td className="px-2 py-2">{evento.categoria?.nombre ?? "-"}</td>
                                     </tr>
                                 ))

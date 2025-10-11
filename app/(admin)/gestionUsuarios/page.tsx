@@ -125,7 +125,7 @@ export default function GestionUsuarios() {
                                         </td>
                                         <td className="px-2 py-2 break-words">{usuario.correo}</td>
                                         <td className="px-2 py-2">
-                                            {new Date(usuario.fecha_registro).toLocaleDateString()}
+                                            {usuario.fecha_registro.split("-").reverse().join("/")}
                                         </td>
                                         <td className="px-2 py-2">
                                             {usuario.activo ? (
