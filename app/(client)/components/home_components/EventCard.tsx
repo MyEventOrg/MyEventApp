@@ -7,8 +7,8 @@ export type EventoBase = {
     evento_id: number;
     titulo: string;
     descripcion_corta: string;
-    fecha_evento: string;     // "YYYY-MM-DD"
-    hora: string | null;      // "HH:mm" | null
+    fecha_evento: string;
+    hora: string | null;     
     tipo_evento: string;
     ubicacion: string | null;
     ciudad?: string | null;
@@ -185,6 +185,14 @@ export default function EventCard({
                     );
                 })()
             )}
+            <div className="mt-3 flex items-center justify-between gap-2">
+                <span className={`text-xs px-2 py-0.5 rounded-full ${e.tipo_evento === "publico" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                    {e.tipo_evento === "publico" ? "Público" : "Privado"}
+                </span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${e.rol === "organizador" ? "bg-violet-100 text-violet-700" : "bg-amber-100 text-amber-700"}`}>
+                    {e.rol === "organizador" ? "Organizador" : "Asistente"}
+                </span>
+            </div>
         </article>
     );
 }

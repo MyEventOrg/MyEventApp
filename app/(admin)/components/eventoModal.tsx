@@ -73,11 +73,11 @@ export default function EventoModal({ isOpen, onClose, evento }: EventoModalProp
                             </p>
                             <p>
                                 <span className="font-semibold text-[#3F78A1]">Fecha de creación:</span>{" "}
-                                {new Date(evento?.fecha_creacion_evento || "").toLocaleDateString()}
+                                {evento?.fecha_creacion_evento.split("-").reverse().join("/")}
                             </p>
                             <p>
                                 <span className="font-semibold text-[#3F78A1]">Fecha del evento:</span>{" "}
-                                {new Date(evento?.fecha_evento || "").toLocaleDateString()} — {evento?.hora}
+                                {evento?.fecha_evento.split("-").reverse().join("/")} — {evento?.hora}
                             </p>
                             <p>
                                 <span className="font-semibold text-[#3F78A1]">Ubicación:</span>{" "}
