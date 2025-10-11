@@ -41,7 +41,6 @@ const getUsuariosAdmin = async (page: number = 1, search: string = "") => {
     }
 };
 
-
 const updateUsuarioEstado = async (id: number, activo: number) => {
     try {
         const res = await base.put(`/usuarios/${id}/estado`, { activo });

@@ -27,9 +27,9 @@ export default function GestionUsuarios() {
         setLoading(true);
         const res = await UsuarioApi.getUsuariosAdmin(p, s);
         if (res && res.data) {
-            setUsuarios(res.data.data);
-            setPage(res.data.page);
-            setTotalPages(res.data.totalPages);
+            setUsuarios(res.data);
+            setPage(res.page);
+            setTotalPages(res.totalPages);
         }
         setLoading(false);
     };
