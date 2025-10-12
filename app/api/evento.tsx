@@ -53,7 +53,7 @@ const createEvento = async (eventoData: any) => {
                 }
             });
 
-            console.log("🚀 Enviando evento con PDF adjunto");
+            console.log("Enviando evento con PDF adjunto");
             
             const res = await fileApi.post(`/eventos`, formData, {
                 headers: {
@@ -67,7 +67,7 @@ const createEvento = async (eventoData: any) => {
             return res.data;
         }
     } catch (error) {
-        console.error("❌ Error al crear evento:", error);
+        console.error("Error al crear evento:", error);
         return { success: false, message: "No se pudo crear el evento" };
     }
 };
