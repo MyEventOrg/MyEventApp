@@ -6,6 +6,7 @@ type UserPayload = {
     apodo: string;
     rol: "user" | "admin" | string;
     iat: number;
+    url_imagen?: string | null;
 };
 
 type UserContextType = {
@@ -52,16 +53,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     const refreshFromCookie = () => {
+    
         setLoading(true);
         try {
             const token = getCookie("token");
             if (!token) {
+                console.log('❌ No hay token en cookie');
                 setUser(null);
                 return;
             }
 
             const payload = decodeJwt<UserPayload>(token);
             if (!payload) {
+                console.log('❌ No se pudo decodificar el token');
                 setUser(null);
                 return;
             }

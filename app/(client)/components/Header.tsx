@@ -65,9 +65,9 @@ export default function Header() {
                             {isAuthenticated ? (
                                 <>
                                     <img
-                                        src="/User.png"
+                                        src={user?.url_imagen || "/User.png"}
                                         alt="Usuario"
-                                        className="w-8 h-8 rounded-full"
+                                        className="w-8 h-8 rounded-full object-cover"
                                     />
                                     <p className="text-grayish text-xl">{user?.apodo}</p>
                                 </>
