@@ -5,7 +5,7 @@ import usuarioApi from '../../../api/usuario';
 import { ProfileData } from '../types';
 import { useUser } from '../../../context/userContext';
 
-// Hook principal para gestión de perfil de usuario 
+// Hook principal gestiona perfil
 export function useProfile() {
   const { user, refreshFromCookie } = useUser();
   const router = useRouter();

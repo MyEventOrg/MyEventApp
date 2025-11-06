@@ -51,7 +51,7 @@ const updateUsuarioEstado = async (id: number, activo: number) => {
     }
 };
 
-// --- Perfil (tipos) ---
+// Perfil
 export type PerfilData = {
     usuario_id: number;
     nombreCompleto: string;
