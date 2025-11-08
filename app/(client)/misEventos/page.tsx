@@ -1,4 +1,4 @@
-import NoMainHeader from "../components/NoMainHeader";
+import NoMainHeader from "../../components/NoMainHeader";
 export default function MisEventos() {
     return (
         <>

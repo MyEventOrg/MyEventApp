@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProfileData } from '../types';
+import { ProfileData } from '../(client)/perfil/types';
 
 // Componente para la información de la cuenta
 export default function InfoCuenta({ profileData }: { profileData: ProfileData }) {

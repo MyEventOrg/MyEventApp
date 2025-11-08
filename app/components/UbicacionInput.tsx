@@ -1,6 +1,6 @@
 import React from "react";
 import { GoogleMap, Marker, Autocomplete, useJsApiLoader } from "@react-google-maps/api";
-import { EventFormData } from "../types";
+import { EventFormData } from "../(client)/crearEvento/types";
 
 interface Props {
     value: string;

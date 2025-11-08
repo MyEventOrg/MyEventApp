@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Advice from "../../../components/Advice";
+import Advice from "./Advice";
 import { useState } from "react";
 type Props = {
     open: boolean;

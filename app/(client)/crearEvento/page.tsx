@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import NoMainHeader from "../components/NoMainHeader";
+import NoMainHeader from "../../components/NoMainHeader";
 import { EventFormData } from "./types";
-import CategoriaSelector from "./components/CategoriaSelector";
-import ImagenUpload from "./components/ImagenUpload";
-import RecursoUpload from "./components/RecursoUpload";
-import UbicacionInput from "./components/UbicacionInput";
+import CategoriaSelector from "../../components/CategoriaSelector";
+import ImagenUpload from "../../components/ImagenUpload";
+import RecursoUpload from "../../components/RecursoUpload";
+import UbicacionInput from "../../components/UbicacionInput";
 import useCategorias from "./hooks/useCategorias";
 import eventoApi from "../../api/evento";
 import { useUser } from "../../context/userContext";

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEstadisticasUsuario } from '../hooks/useEstadisticasUsuario';
+import { useEstadisticasUsuario } from '../(client)/perfil/hooks/useEstadisticasUsuario';
 
 // Componente para las estadísticas de la cuenta
 export default function EstadisticasCuenta() {

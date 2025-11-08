@@ -1,5 +1,5 @@
 import React from "react";
-import { Categoria } from "../types";
+import { Categoria } from "../(client)/crearEvento/types";
 
 interface Props {
     categorias: Categoria[];

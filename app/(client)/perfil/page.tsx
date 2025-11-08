@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import NoMainHeader from "../components/NoMainHeader";
+import NoMainHeader from "../../components/NoMainHeader";
 import { Toaster } from "react-hot-toast";
-import DatosPerfil from "./components/DatosPerfil";
-import InfoCuenta from "./components/InfoCuenta";
-import EstadisticasCuenta from "./components/EstadisticasCuenta";
-import EliminarCuenta from "./components/EliminarCuenta";
+import DatosPerfil from "../../components/DatosPerfil";
+import InfoCuenta from "../../components/InfoCuenta";
+import EstadisticasCuenta from "../../components/EstadisticasCuenta";
+import EliminarCuenta from "../../components/EliminarCuenta";
 import { useProfile } from "./hooks/useProfile";
 
 export default function PerfilPage() {
