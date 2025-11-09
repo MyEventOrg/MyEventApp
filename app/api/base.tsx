@@ -19,7 +19,10 @@ const postImg = async <T = any>(
 ): Promise<AxiosResponse<T>> => api.post<T>(endpoint, payload, config);
 
 const put = async <T = any>(endpoint: string, payload?: unknown): Promise<AxiosResponse<T>> => api.put<T>(endpoint, payload);
-const remove = async <T = any>(endpoint: string): Promise<AxiosResponse<T>> => api.delete<T>(endpoint);
+const remove = async <T = any>(
+    endpoint: string,
+    config?: any
+): Promise<AxiosResponse<T>> => api.delete<T>(endpoint, config);
 
 const base = { get, post, put, remove, postImg };
 export default base;
