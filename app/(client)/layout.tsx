@@ -7,9 +7,11 @@ import { usePathname } from "next/navigation";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const noHeaderRoutes = ["/misEventos", "/perfil","/crearEvento"];
-
-  const shouldShowHeader = !noHeaderRoutes.includes(pathname);
+  const shouldShowHeader =
+    !pathname.startsWith("/misEventos") &&
+    !pathname.startsWith("/perfil") &&
+    !pathname.startsWith("/crearEvento") &&
+    !pathname.startsWith("/evento/");
 
   return (
     <>

@@ -2,6 +2,7 @@
 
 import { CalendarDays, Clock, MapPin as MapPinStroke, Users2, Eye } from "lucide-react";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 export type EventoBase = {
     evento_id: number;
@@ -100,6 +101,8 @@ export default function EventCard({
     showMap?: boolean;
     isEventosAsistiendoPage?: boolean;
 }) {
+    const router = useRouter();
+
     const e = event;
     const mapUrl = showMap ? buildStaticMapUrl(e) : null;
     const coords = getCoords(e);
@@ -115,7 +118,10 @@ export default function EventCard({
         >
             <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold text-gray-900 line-clamp-1">{e.titulo}</h3>
-                <Eye className="w-4 h-4 text-gray-400" />
+                <Eye
+                    className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/evento/${e.evento_id}`)}
+                />
             </div>
             <p className="text-sm text-gray-600 mt-1 line-clamp-3">{e.descripcion_corta}</p>
             <div className="mt-3 space-y-2 text-sm text-gray-700">

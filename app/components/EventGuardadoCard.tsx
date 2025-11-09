@@ -234,13 +234,13 @@ export default function EventCard({
                     <span className={`text-xs px-2 py-0.5 rounded-full ${e.tipo_evento === "publico" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                         {e.tipo_evento === "publico" ? "Público" : "Privado"}
                     </span>
-                    <a
-                        href={`/eventos/${e.evento_id}`} // ajusta tu ruta si es distinta
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-white bg-[#337ab7] hover:bg-[#286090] text-sm font-medium rounded-full"
+                    <button
+                        onClick={() => router.push(`/evento/${e.evento_id}`)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 cursor-pointer text-white bg-[#337ab7] hover:bg-[#286090] text-sm font-medium rounded-full"
                     >
                         <Eye className="w-4 h-4" />
                         Ver Detalles
-                    </a>
+                    </button>
                 </div>
                 {event.estado_evento === "vencido" && (
                     <div className="mt-3 text-sm text-red-600 font-medium">

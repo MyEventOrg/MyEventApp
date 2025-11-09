@@ -29,7 +29,7 @@ export default function EventoCreadoCard({ evento }: Props) {
                     {titulo}
                 </h2>
                 <div className="flex items-center gap-2">
-                    <Link href={`/eventos/${evento_id}`}>
+                    <Link href={`/evento/${evento_id}`}>
                         <Eye className="w-4 h-4 text-green-500 hover:text-green-700 cursor-pointer" />
                     </Link>
                 </div>

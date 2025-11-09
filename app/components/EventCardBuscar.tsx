@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import eventoGuardadoApi from "../api/eventoGuardado";
 import Aviso from "./Aviso";
 import Advice from "./Advice";
-
+import { useRouter } from "next/navigation";
 export type EventoBase = {
     evento_id: number;
     titulo: string;
@@ -91,7 +91,7 @@ export default function EventCardBuscar({
     const [avisoMensaje, setAvisoMensaje] = useState("");
     const [avisoTipo, setAvisoTipo] = useState<"success" | "error">("success");
     const [adviceOpen, setAdviceOpen] = useState(false);
-
+    const router = useRouter();
     const toggleLike = () => {
         // Aquí más adelante puedes implementar el POST a guardar evento
         setLiked((prev) => !prev);
@@ -230,7 +230,12 @@ export default function EventCardBuscar({
                 {/* Mapa */}
                 {showMap && (
                     mapUrl && e.url_direccion ? (
-                        <a href={e.url_direccion} target="_blank" rel="noopener noreferrer" className="block mt-3">
+                        <a
+                            href={e.url_direccion}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block mt-3"
+                        >
                             <div className="relative w-full h-[120px] rounded-xl overflow-hidden border shadow-sm">
                                 <img
                                     src={mapUrl}
@@ -238,6 +243,22 @@ export default function EventCardBuscar({
                                     className="w-full h-full object-cover pointer-events-none select-none"
                                     draggable={false}
                                 />
+
+                                {e.ubicacion && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="bg-white/95 text-gray-800 text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1 truncate">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="#ef4444"
+                                                className="w-3.5 h-3.5"
+                                            >
+                                                <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zM12 11.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+                                            </svg>
+                                            <span className="truncate max-w-[90%]">{e.ubicacion}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </a>
                     ) : (
@@ -255,16 +276,14 @@ export default function EventCardBuscar({
                         Evento {e.tipo_evento === "publico" ? "Público" : "Privado"}
                     </span>
 
-                    {/* Rol */}
                     {renderRolButton()}
 
-                    {/* Ver detalles */}
-                    <a
-                        href={`/evento/${e.evento_id}`}
-                        className="text-xs px-3 py-5 bg-sky-700 text-white rounded-2xl font-medium hover:bg-sky-800 transition"
+                    <button
+                        onClick={() => router.push(`/evento/${e.evento_id}`)}
+                        className="text-xs px-3 py-5 bg-sky-700 text-white rounded-2xl cursor-pointer font-medium hover:bg-sky-800 transition"
                     >
                         Ver Detalles
-                    </a>
+                    </button>
                 </div>
 
                 {isEventosAsistiendoPage && e.estado_evento === "vencido" && (

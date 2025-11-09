@@ -94,5 +94,17 @@ const eventosFiltrados = async (
     }
 };
 
+const getEventoById = async (id: number) => {
+    try {
+        const res = await base.get(`/evento/${id}`);
+        return res.data; // contiene { success, data, message }
+    } catch (error) {
+        console.error("Error al obtener evento por ID:", error);
+        return {
+            success: false,
+            message: "No se pudo obtener la información del evento",
+        };
+    }
+};
 
-export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados };
+export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados, getEventoById };
