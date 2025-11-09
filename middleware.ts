@@ -28,7 +28,8 @@ export async function middleware(req: NextRequest) {
         pathname.startsWith("/perfil") ||
         pathname.startsWith("/crearEvento") ||
         pathname.startsWith("/misEventos") ||
-        pathname.startsWith("/eventosGuardados");
+        pathname.startsWith("/eventosGuardados") ||
+        pathname.startsWith("/misAsistencias");;
 
     // rutas de admin
     const isAdminRoute =
@@ -99,6 +100,7 @@ export const config = {
         "/misEventos/:path*",
         "/eventosGuardados/:path*",
         "/crearEvento/:path*",
+        "/misAsistencias/:path*",
         // rutas admin
         "/eventosPublicos/:path*",
         "/eventosPrivados/:path*",

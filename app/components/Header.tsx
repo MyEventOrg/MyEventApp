@@ -150,19 +150,19 @@ export default function Header() {
                             </Link>
                         </li>
                         <li
-                            className={`py-4 ${pathname === "/eventosAsistidos"
+                            className={`py-4 ${pathname === "/misAsistencias"
                                 ? "border-b-2 border-primary"
                                 : ""
                                 }`}
                         >
                             <Link
-                                href="/eventosAsistidos"
-                                className={`text-[1rem] text-headertext ${pathname === "/eventosAsistidos"
+                                href="/misAsistencias"
+                                className={`text-[1rem] text-headertext ${pathname === "/misAsistencias"
                                     ? "text-primary"
                                     : "hover:text-grayish"
                                     }`}
                             >
-                                Eventos a los que asistió
+                                Mis Asistencias
                             </Link>
                         </li>
                     </ul>

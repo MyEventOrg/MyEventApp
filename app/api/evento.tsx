@@ -43,7 +43,7 @@ const createEvento = async (eventoData: any) => {
         // Si hay un archivo PDF, usar FormData
         if (eventoData.url_recurso && eventoData.url_recurso instanceof File) {
             const formData = new FormData();
-            
+
             // Agregar todos los campos del evento
             Object.keys(eventoData).forEach(key => {
                 if (key === 'url_recurso' && eventoData[key] instanceof File) {
@@ -54,7 +54,7 @@ const createEvento = async (eventoData: any) => {
             });
 
             console.log("Enviando evento con PDF adjunto");
-            
+
             const res = await fileApi.post(`/eventos`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -72,4 +72,27 @@ const createEvento = async (eventoData: any) => {
     }
 };
 
-export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento };
+
+const eventosFiltrados = async (
+    search: string,
+    tipo: string,
+    categoria: string,
+    usuario_id: number // obligatorio
+) => {
+    try {
+        const params = new URLSearchParams();
+
+        if (search) params.append("search", search);
+        if (tipo && tipo !== "Todos") params.append("tipo", tipo);
+        if (categoria && categoria !== "Todas las categorías") params.append("categoria", categoria);
+
+        const res = await base.get(`/buscarEventos/${usuario_id}?${params.toString()}`);
+        return res.data;
+    } catch (error) {
+        console.error("Error al filtrar eventos:", error);
+        return { data: [], total: 0 };
+    }
+};
+
+
+export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados };

@@ -130,7 +130,7 @@ export default function ResumenPage() {
                             title="Asistiendo"
                             value={totals.asistiendo}
                             icon="users"
-                            href="/eventosAsistidos"
+                            href="/misAsistencias"
                             numberClass="text-green-600"
                             iconClass="text-green-500"
                         />

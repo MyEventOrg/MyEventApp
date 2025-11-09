@@ -8,7 +8,7 @@ export type EventoBase = {
     titulo: string;
     descripcion_corta: string;
     fecha_evento: string;
-    hora: string | null;     
+    hora: string | null;
     tipo_evento: string;
     ubicacion: string | null;
     ciudad?: string | null;
@@ -18,6 +18,7 @@ export type EventoBase = {
     latitud?: string | number | null;
     longitud?: string | number | null;
     url_imagen?: string | null;
+    asistentes?: number;
 };
 
 export type EventoWithRol = EventoBase & { rol: "organizador" | "asistente" };
@@ -92,10 +93,12 @@ export default function EventCard({
     event,
     className = "",
     showMap = true,
+    isEventosAsistiendoPage = false,
 }: {
     event: EventoWithRol;
     className?: string;
     showMap?: boolean;
+    isEventosAsistiendoPage?: boolean;
 }) {
     const e = event;
     const mapUrl = showMap ? buildStaticMapUrl(e) : null;
@@ -139,7 +142,12 @@ export default function EventCard({
                 </div>
                 <div className="flex items-center gap-2">
                     <Users2 className="w-4 h-4 text-gray-500" />
-                    <span className="capitalize">{e.rol}</span>
+                    <span>
+                        {typeof e.asistentes !== "number" || e.asistentes <= 0
+                            ? "No hay asistentes"
+                            : `${e.asistentes} ${e.asistentes === 1 ? "asistente" : "asistentes"}`}
+                    </span>
+
                 </div>
             </div>
 
@@ -193,6 +201,11 @@ export default function EventCard({
                     {e.rol === "organizador" ? "Organizador" : "Asistente"}
                 </span>
             </div>
+            {isEventosAsistiendoPage && event.estado_evento === "vencido" && (
+                <div className="mt-3 text-sm text-red-600 font-medium">
+                    <span>El evento ha vencido</span>
+                </div>
+            )}
         </article>
     );
 }
