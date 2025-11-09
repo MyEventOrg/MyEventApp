@@ -94,10 +94,12 @@ const eventosFiltrados = async (
     }
 };
 
-const getEventoById = async (id: number) => {
+const getEventoById = async (id: number, usuario_id: number) => {
     try {
-        const res = await base.get(`/evento/${id}`);
-        return res.data; // contiene { success, data, message }
+        const res = await base.getParams(`/evento/${id}`, {
+            params: { usuario_id }  // <-- Esto solo funciona si 'base' es Axios
+        });
+        return res.data; // { success, data, message }
     } catch (error) {
         console.error("Error al obtener evento por ID:", error);
         return {
@@ -106,5 +108,6 @@ const getEventoById = async (id: number) => {
         };
     }
 };
+
 
 export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados, getEventoById };

@@ -24,5 +24,11 @@ const remove = async <T = any>(
     config?: any
 ): Promise<AxiosResponse<T>> => api.delete<T>(endpoint, config);
 
-const base = { get, post, put, remove, postImg };
+// ✅ Versión extendida del GET para permitir params opcionales
+const getParams = async <T = any>(
+    endpoint: string,
+    config?: Record<string, any> // <-- este parámetro opcional permitirá { params }
+): Promise<AxiosResponse<T>> => api.get<T>(endpoint, config);
+
+const base = { get, post, put, remove, postImg, getParams };
 export default base;

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import eventoApi from "../../../api/evento";
 import { CalendarDays, Clock, MapPin, Users2 } from "lucide-react";
+import { useUser } from "../../../context/userContext";
 // Representa el organizador del evento
 export interface Organizador {
     usuario_id: number;
@@ -43,7 +44,12 @@ export interface EventoWithExtras {
     asistentes: number;
 
     // Propiedades opcionales del frontend
-    asistentes_list?: string[];
+    // Por:
+    asistentes_list?: {
+        nombre: string;
+        correo: string;
+        url_imagen: string | null;
+    }[];
     foro?: { usuario: string; texto: string }[];
 }
 function buildStaticMapUrl(lat: string | null | undefined, lng: string | null | undefined): string | null {
@@ -67,20 +73,32 @@ export default function DetalleEventoPage() {
     const router = useRouter();
     const [evento, setEvento] = useState<EventoWithExtras | null>(null);
     const [loading, setLoading] = useState(true);
+    const { user, loading: userLoading, isAuthenticated } = useUser();
+    const [rol, setRol] = useState<"organizador" | "coorganizador" | "asistente" | "nada">("nada");
 
     useEffect(() => {
+        if (userLoading) return;
+
+        if (!isAuthenticated || !user?.usuario_id) {
+            setLoading(false);
+            return;
+        }
+
         if (!id) return;
 
         (async () => {
-            const res = await eventoApi.getEventoById(Number(id));
+            const res = await eventoApi.getEventoById(Number(id), user.usuario_id);
             if (res.success) {
                 setEvento(res.data);
+                setRol(res.data.rol);
+
             } else {
                 console.error("Error al cargar evento:", res.message);
             }
             setLoading(false);
         })();
-    }, [id]);
+    }, [id, user, userLoading]);
+
 
     if (loading) {
         return <p className="p-12 text-gray-500 text-center">Cargando evento...</p>;
@@ -104,9 +122,18 @@ export default function DetalleEventoPage() {
                     />
                     <div className="font-bold text-black text-3xl">{evento.titulo}</div>
                 </div>
-                <button className="bg-lime-400 hover:bg-lime-500 text-white font-bold py-2 px-6 rounded-xl transition-all">
-                    Unirse
-                </button>
+                {rol === "nada" && (
+                    <button className="bg-lime-400 cursor-pointer hover:bg-lime-500 text-white font-bold py-2 px-6 rounded-xl transition-all">
+                        Unirse al evento
+                    </button>
+                )}
+
+                {rol === "asistente" && (
+                    <button className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-bold py-2 px-6 rounded-xl transition-all">
+                        Anular inscripción
+                    </button>
+                )}
+
             </header>
 
             {/* Cuerpo */}
@@ -145,16 +172,31 @@ export default function DetalleEventoPage() {
                                     <Users2 className="w-4 h-4 text-gray-500" />
                                     Asistentes
                                 </span>
-                                <p>{evento.asistentes} confirmados</p>
+                                <p>{evento.asistentes_list?.length || 0} confirmados</p>
                             </div>
                         </div>
 
 
-                        <div className="mt-6">
-                            <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                                Evento {evento.tipo_evento === "publico" ? "Público" : "Privado"}
-                            </span>
-                        </div>
+                        {rol !== "nada" && (
+                            <div className="flex gap-3 mt-6 justify-between">
+                                <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                                    Evento {evento.tipo_evento === "publico" ? "Público" : "Privado"}
+                                </span>
+
+                                <span className={
+                                    "text-sm font-medium px-3 py-1 rounded-full capitalize " +
+                                    (rol === "organizador"
+                                        ? "bg-blue-100 text-blue-600"
+                                        : rol === "coorganizador"
+                                            ? "bg-purple-100 text-purple-600"
+                                            : "bg-yellow-100 text-yellow-600")
+                                }>
+                                    {rol}
+                                </span>
+                            </div>
+                        )}
+
+
                     </section>
 
                     {/* Mapa */}
@@ -212,19 +254,42 @@ export default function DetalleEventoPage() {
 
                 {/* Columna derecha */}
                 <div className="lg:col-span-5 space-y-10">
+                    {rol === "organizador" && (
+                        <section className="bg-white p-6 rounded-xl shadow">
+                            <h3 className="text-xl font-semibold mb-4">Acciones</h3>
+                            <button className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
+                                Invitar Personas
+                            </button>
+                        </section>
+                    )}
                     {/* Asistentes */}
                     <section className="bg-white p-6 rounded-xl shadow">
-                        <h3 className="text-xl font-semibold mb-4">Asistentes ({evento.asistentes})</h3>
-                        <ul className="space-y-2">
-                            {(evento.asistentes_list || []).map((u, i) => (
-                                <li key={i} className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold text-blue-600">
-                                        U
-                                    </div>
-                                    <span className="text-sm text-gray-800">{u}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        <h3 className="text-xl font-semibold mb-4">
+                            Asistentes ({evento.asistentes_list?.length || 0})
+                        </h3>
+
+                        <div className="max-h-64 overflow-y-auto pr-1">
+                            <ul className="space-y-3">
+                                {(evento.asistentes_list || []).map((u, i) => (
+                                    <li key={i} className="flex items-center gap-3">
+                                        {u.url_imagen ? (
+                                            <img
+                                                src={u.url_imagen}
+                                                alt={u.nombre}
+                                                className="w-8 h-8 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center font-bold text-white">
+                                                {u.nombre?.charAt(0).toUpperCase() || "U"}
+                                            </div>
+                                        )}
+                                        <span className="text-sm text-gray-800 truncate max-w-[200px]">
+                                            {u.correo}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </section>
 
                     {/* Foro */}
