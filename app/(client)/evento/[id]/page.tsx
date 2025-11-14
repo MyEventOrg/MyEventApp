@@ -8,6 +8,7 @@ import { useUser } from "../../../context/userContext";
 import asistenciaApi from "../../../api/invitacion";
 import AdviceSimple from "../../../components/AdviceSimple";
 import Advice from "../../../components/Advice";
+import ForoEvento from "../../../components/ForoEvento";
 
 
 // Representa el organizador del evento
@@ -49,13 +50,11 @@ export interface EventoWithExtras {
     asistentes: number;
 
     // Propiedades opcionales del frontend
-    // Por:
     asistentes_list?: {
         nombre: string;
         correo: string;
         url_imagen: string | null;
     }[];
-    foro?: { usuario: string; texto: string }[];
 }
 function buildStaticMapUrl(lat: string | null | undefined, lng: string | null | undefined): string | null {
     const key = "AIzaSyDdTo8nhURFO9BsyUd0LtaOH9VR7dmCIwM";
@@ -389,17 +388,10 @@ export default function DetalleEventoPage() {
                     </section>
 
                     {/* Foro */}
-                    <section className="bg-white p-6 rounded-xl shadow">
-                        <h3 className="text-xl font-semibold mb-4">Foro</h3>
-                        <ul className="space-y-4">
-                            {(evento.foro || []).map((coment, i) => (
-                                <li key={i} className="bg-gray-100 p-3 rounded-lg text-sm">
-                                    <strong className="block mb-1">{coment.usuario}</strong>
-                                    <p>{coment.texto}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    </section>
+                    <ForoEvento 
+                        evento_id={evento.evento_id} 
+                        estado_evento={evento.estado_evento} 
+                    />
                 </div>
             </div>
             <AdviceSimple
