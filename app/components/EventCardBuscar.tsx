@@ -3,9 +3,12 @@
 import { CalendarDays, Clock, MapPin as MapPinStroke, Users2, Heart } from "lucide-react";
 import React, { useState } from "react";
 import eventoGuardadoApi from "../api/eventoGuardado";
+import invitacionApi from "../api/invitacion";
 import Aviso from "./Aviso";
 import Advice from "./Advice";
 import { useRouter } from "next/navigation";
+import { useUser } from "../context/userContext";
+
 export type EventoBase = {
     evento_id: number;
     titulo: string;
@@ -26,7 +29,7 @@ export type EventoBase = {
 
 };
 
-export type EventoWithRol = EventoBase & { rol?: "organizador" | "asistente" | "nada" | null };
+export type EventoWithRol = EventoBase & { rol?: "organizador" | "asistente" | "asistenciapendiente" | "nada" | null };
 
 function toDateLocal(fecha: string, hora?: string | null) {
     const [y, m, d] = fecha.split("-").map(Number);
@@ -91,6 +94,9 @@ export default function EventCardBuscar({
     const [avisoMensaje, setAvisoMensaje] = useState("");
     const [avisoTipo, setAvisoTipo] = useState<"success" | "error">("success");
     const [adviceOpen, setAdviceOpen] = useState(false);
+    const { user, loading: userLoading, isAuthenticated } = useUser();
+    const [adviceJoinOpen, setAdviceJoinOpen] = useState(false);
+
     const router = useRouter();
     const toggleLike = () => {
         // Aquí más adelante puedes implementar el POST a guardar evento
@@ -104,6 +110,17 @@ export default function EventCardBuscar({
         (coords ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}` : undefined);
     const placeLabel = e.ubicacion || e.ciudad || e.distrito || "Ver en Google Maps";
 
+    const handleUnirse = async () => {
+        if (!user?.usuario_id) return;
+
+        const res = await invitacionApi.asistirEvento({
+            evento_id: e.evento_id,
+            usuario_id: user.usuario_id,
+        });
+
+        window.location.reload();
+    };
+
     const renderRolButton = () => {
         if (e.rol === "organizador") {
             return (
@@ -112,16 +129,24 @@ export default function EventCardBuscar({
                 </span>
             );
         }
+        if (e.rol === "asistenciapendiente") {
+            return (
+                <span className="text-xs px-2 flex items-center gap-1 py-5 rounded-2xl bg-yellow-100 text-yellow-700 font-medium">
+                    <Clock />
+                    Asistencia Pendiente
+                </span>
+            );
+        }
         if (e.rol === "asistente") {
             return (
-                <span className="text-xs px-2 py-5 rounded-2xl bg-green-100 text-green-700 font-medium">
+                <span className="text-xs px-2 py-5 rounded-2xl bg-cyan-500 text-white font-medium">
                     Asistencia Confirmada
                 </span>
             );
         }
         return (
             <button
-                onClick={() => alert("Funcionalidad de unirse al evento no implementada aún")}
+                onClick={() => setAdviceJoinOpen(true)}
                 className="text-xs px-3 py-5 cursor-pointer rounded-2xl bg-green-500 text-white font-medium hover:bg-green-600 transition"
             >
                 Unirse al Evento
@@ -301,6 +326,13 @@ export default function EventCardBuscar({
                 message="¿Seguro que ya no quieres guardar este evento?"
                 onConfirm={handleEliminarEventoGuardado}
                 onClose={() => setAdviceOpen(false)}
+            />
+
+            <Advice
+                isOpen={adviceJoinOpen}
+                message="¿Seguro que quieres unirte al evento?"
+                onConfirm={handleUnirse}
+                onClose={() => setAdviceJoinOpen(false)}
             />
         </>
     );

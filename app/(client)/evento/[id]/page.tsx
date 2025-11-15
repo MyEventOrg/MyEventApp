@@ -5,6 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import eventoApi from "../../../api/evento";
 import { CalendarDays, Clock, MapPin, Users2 } from "lucide-react";
 import { useUser } from "../../../context/userContext";
+import asistenciaApi from "../../../api/invitacion";
+import AdviceSimple from "../../../components/AdviceSimple";
+import Advice from "../../../components/Advice";
+
+
 // Representa el organizador del evento
 export interface Organizador {
     usuario_id: number;
@@ -74,7 +79,37 @@ export default function DetalleEventoPage() {
     const [evento, setEvento] = useState<EventoWithExtras | null>(null);
     const [loading, setLoading] = useState(true);
     const { user, loading: userLoading, isAuthenticated } = useUser();
-    const [rol, setRol] = useState<"organizador" | "coorganizador" | "asistente" | "nada">("nada");
+    const [rol, setRol] = useState<"organizador" | "asistenciapendiente" | "asistente" | "nada">("nada");
+    const [adviceOpen, setAdviceOpen] = useState(false);
+    const [adviceMessage, setAdviceMessage] = useState("");
+    const [cancelAdviceOpen, setCancelAdviceOpen] = useState(false);
+
+    const handleCancelarAsistencia = async () => {
+        if (!user?.usuario_id) return;
+
+        const res = await asistenciaApi.anularAsistencia({
+            evento_id: Number(id),
+            usuario_id: user.usuario_id,
+        });
+
+        setAdviceMessage(res.message);
+        setAdviceOpen(true); // mostramos el mensaje final
+
+        // reload después de cerrar el modal (ya lo tienes abajo)
+    };
+
+    const handleUnirse = async () => {
+        if (!user?.usuario_id) return;
+
+        const res = await asistenciaApi.asistirEvento({
+            evento_id: Number(id),
+            usuario_id: user.usuario_id,
+        });
+
+        setAdviceMessage(res.message);
+        setAdviceOpen(true);  // solo mostrar modal
+    };
+
 
     useEffect(() => {
         if (userLoading) return;
@@ -122,14 +157,26 @@ export default function DetalleEventoPage() {
                     />
                     <div className="font-bold text-black text-3xl">{evento.titulo}</div>
                 </div>
+                {rol === "asistenciapendiente" && (
+                    <button className="bg-yellow-400 flex gap-2 text-white font-bold py-2 px-6 rounded-xl transition-all">
+                        <Clock />
+                        Asistencia pendiente
+                    </button>
+                )}
+
+
                 {rol === "nada" && (
-                    <button className="bg-lime-400 cursor-pointer hover:bg-lime-500 text-white font-bold py-2 px-6 rounded-xl transition-all">
+                    <button
+                        className="bg-lime-400 cursor-pointer hover:bg-lime-500 text-white font-bold py-2 px-6 rounded-xl transition-all"
+                        onClick={handleUnirse}
+                    >
                         Unirse al evento
                     </button>
                 )}
 
+
                 {rol === "asistente" && (
-                    <button className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-bold py-2 px-6 rounded-xl transition-all">
+                    <button onClick={() => setCancelAdviceOpen(true)} className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-bold py-2 px-6 rounded-xl transition-all">
                         Anular inscripción
                     </button>
                 )}
@@ -187,11 +234,11 @@ export default function DetalleEventoPage() {
                                     "text-sm font-medium px-3 py-1 rounded-full capitalize " +
                                     (rol === "organizador"
                                         ? "bg-blue-100 text-blue-600"
-                                        : rol === "coorganizador"
-                                            ? "bg-purple-100 text-purple-600"
-                                            : "bg-yellow-100 text-yellow-600")
+                                        : rol === "asistenciapendiente"
+                                            ? "bg-yellow-100 text-yellow-600"
+                                            : "bg-purple-100 text-purple-600")
                                 }>
-                                    {rol}
+                                    {rol === "asistenciapendiente" ? "Pendiente" : rol}
                                 </span>
                             </div>
                         )}
@@ -306,6 +353,22 @@ export default function DetalleEventoPage() {
                     </section>
                 </div>
             </div>
+            <AdviceSimple
+                isOpen={adviceOpen}
+                message={adviceMessage}
+                onClose={() => {
+                    setAdviceOpen(false);
+                    window.location.reload();
+                }}
+            />
+            <Advice
+                isOpen={cancelAdviceOpen}
+                message="¿Seguro que deseas cancelar tu inscripción?"
+                onConfirm={handleCancelarAsistencia}
+                onClose={() => setCancelAdviceOpen(false)}
+            />
+
+
         </main>
     );
 }
