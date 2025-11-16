@@ -11,7 +11,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     !pathname.startsWith("/misEventos") &&
     !pathname.startsWith("/perfil") &&
     !pathname.startsWith("/crearEvento") &&
-    !pathname.startsWith("/evento/");
+    !pathname.startsWith("/evento/") &&
+    !pathname.startsWith("/editarEvento/");;
 
   return (
     <>

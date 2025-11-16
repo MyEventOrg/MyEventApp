@@ -109,5 +109,30 @@ const getEventoById = async (id: number, usuario_id: number) => {
     }
 };
 
-
-export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados, getEventoById };
+const getEventoByIdEditar = async (id: number, usuario_id: number) => {
+    try {
+        const res = await base.getParams(`/eventoEditar/${id}`, {
+            params: { usuario_id }  // <-- Esto solo funciona si 'base' es Axios
+        });
+        return res.data; // { success, data, message }
+    } catch (error) {
+        console.error("Error al obtener evento por ID:", error);
+        return {
+            success: false,
+            message: "No se pudo obtener la información del evento",
+        };
+    }
+};
+const updateEvento = async (id: number, payload: any) => {
+    try {
+        const res = await base.put(`/updateEvento/${id}`, payload);
+        return res.data; // { success, data, message }
+    } catch (error) {
+        console.error("Error al actualizar evento:", error);
+        return {
+            success: false,
+            message: "No se pudo actualizar el evento",
+        };
+    }
+};
+export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados, getEventoById, getEventoByIdEditar, updateEvento };

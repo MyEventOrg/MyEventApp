@@ -53,6 +53,14 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    const msg = localStorage.getItem("eventoActualizadoExito");
+    if (msg) {
+      showAviso(msg, "exito");
+      localStorage.removeItem("eventoActualizadoExito");
+    }
+  }, []);
+
   const { user, loading: userLoading, isAuthenticated } = useUser();
   const [totals, setTotals] = useState<Totals>({ creados: 0, asistiendo: 0, guardados: 0 });
   const [loading, setLoading] = useState(true);

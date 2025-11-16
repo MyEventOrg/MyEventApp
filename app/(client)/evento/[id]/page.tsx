@@ -192,6 +192,17 @@ export default function DetalleEventoPage() {
                         <h2 className="text-2xl font-bold mb-4">{evento.titulo}</h2>
                         <p className="text-gray-700 mb-6">{evento.descripcion_corta}</p>
 
+                        {evento.url_imagen ? (
+                            <img
+                                src={evento.url_imagen}
+                                alt={evento.titulo}
+                                className="h-64 object-cover rounded-xl mb-6 shadow"
+                            />
+                        ) : (
+                            <div className="h-64 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 mb-6">
+                                Imagen no disponible
+                            </div>
+                        )}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-600">
                             <div>
                                 <span className="font-semibold flex items-center gap-1">
@@ -304,9 +315,18 @@ export default function DetalleEventoPage() {
                     {rol === "organizador" && (
                         <section className="bg-white p-6 rounded-xl shadow">
                             <h3 className="text-xl font-semibold mb-4">Acciones</h3>
-                            <button className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
-                                Invitar Personas
-                            </button>
+
+                            <div className="flex gap-4">
+                                <button className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
+                                    Invitar Personas
+                                </button>
+                                <button onClick={() => router.push(`/editarEvento/${id}`)} className="bg-blue-200 hover:bg-blue-300 cursor-pointer text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
+                                    Editar Evento
+                                </button>
+                                <button className="bg-red-600 hover:bg-red-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
+                                    Eliminar Evento
+                                </button>
+                            </div>
                         </section>
                     )}
                     {/* Asistentes */}
@@ -369,6 +389,6 @@ export default function DetalleEventoPage() {
             />
 
 
-        </main>
+        </main >
     );
 }
