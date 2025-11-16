@@ -135,4 +135,21 @@ const updateEvento = async (id: number, payload: any) => {
         };
     }
 };
-export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados, getEventoById, getEventoByIdEditar, updateEvento };
+
+const deleteEvento = async (id: number, usuario_id: number) => {
+    try {
+        const res = await base.remove(`/deleteEvento/${id}`, {
+            params: { usuario_id }
+        });
+
+        return res.data; // { success, message }
+    } catch (error) {
+        console.error("Error al eliminar evento:", error);
+        return {
+            success: false,
+            message: "No se pudo eliminar el evento",
+        };
+    }
+};
+
+export default { getEventosPublicos, getEventosPrivados, updateEstadoEvento, createEvento, eventosFiltrados, getEventoById, getEventoByIdEditar, updateEvento, deleteEvento };

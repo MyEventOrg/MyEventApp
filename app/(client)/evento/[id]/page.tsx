@@ -83,6 +83,8 @@ export default function DetalleEventoPage() {
     const [adviceOpen, setAdviceOpen] = useState(false);
     const [adviceMessage, setAdviceMessage] = useState("");
     const [cancelAdviceOpen, setCancelAdviceOpen] = useState(false);
+    const [deleteAdviceOpen, setDeleteAdviceOpen] = useState(false);
+    const [deleteMessage, setDeleteMessage] = useState("");
 
     const handleCancelarAsistencia = async () => {
         if (!user?.usuario_id) return;
@@ -142,6 +144,25 @@ export default function DetalleEventoPage() {
     if (!evento) {
         return <p className="p-12 text-red-500 text-center">Evento no encontrado.</p>;
     }
+
+    const handleDeleteEvento = async () => {
+        if (!user?.usuario_id) return;
+
+        const res = await eventoApi.deleteEvento(Number(id), user.usuario_id);
+
+        setDeleteMessage(res.message);
+
+        if (res.success) {
+            // Mostrar aviso rápido
+            localStorage.setItem("eventoBorrado", "El evento ha sido eliminado correctamente");
+            router.push("/");
+        } else {
+            setAdviceOpen(true);
+        }
+    };
+    const confirmDeleteEvento = () => {
+        setDeleteAdviceOpen(true);
+    };
     const mapUrl = buildStaticMapUrl(evento.latitud, evento.longitud);
     const linkToMaps = evento.url_direccion || (evento.latitud && evento.longitud ? `https://www.google.com/maps?q=${evento.latitud},${evento.longitud}` : undefined);
     return (
@@ -323,9 +344,13 @@ export default function DetalleEventoPage() {
                                 <button onClick={() => router.push(`/editarEvento/${id}`)} className="bg-blue-200 hover:bg-blue-300 cursor-pointer text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
                                     Editar Evento
                                 </button>
-                                <button className="bg-red-600 hover:bg-red-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
+                                <button
+                                    onClick={confirmDeleteEvento}
+                                    className="bg-red-600 hover:bg-red-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
+                                >
                                     Eliminar Evento
                                 </button>
+
                             </div>
                         </section>
                     )}
@@ -388,6 +413,12 @@ export default function DetalleEventoPage() {
                 onClose={() => setCancelAdviceOpen(false)}
             />
 
+            <Advice
+                isOpen={deleteAdviceOpen}
+                message="¿Estás seguro que quieres eliminar el evento?"
+                onConfirm={handleDeleteEvento}
+                onClose={() => setDeleteAdviceOpen(false)}
+            />
 
         </main >
     );

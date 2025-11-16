@@ -12,7 +12,7 @@ export default function Aviso({ mensaje, visible, tipo }: AvisoProps) {
     const bgColor =
         tipo === "error"
             ? "bg-red-500"
-            : "bg-green-500";
+            : "bg-indigo-500";
 
     return (
         <AnimatePresence>
