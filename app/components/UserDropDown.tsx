@@ -13,8 +13,8 @@ export default function UserMenuDropdown({ open, onLogout }: Props) {
     return (
         <>
             <div
-                className={`absolute -right-8 mt-2 w-48 bg-white rounded-lg shadow z-50 transition-all duration-300 ease-in-out overflow-hidden ${open ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
-                    }`}
+                className={`absolute -right-8 mt-2 w-48 bg-white rounded-lg shadow z-50 ${open ? "max-h-[70vh] opacity-100 transition-all duration-300 ease-out" : "max-h-0 opacity-0"}
+`}
             >
                 <ul className="flex flex-col text-left">
                     <li>
