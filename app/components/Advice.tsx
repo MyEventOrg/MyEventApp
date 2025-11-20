@@ -1,15 +1,30 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 interface AdviceProps {
     isOpen: boolean;
     message: string;
-    onConfirm: () => void;
+    onConfirm: () => void | Promise<void>;
     onClose: () => void;
 }
 
 export default function Advice({ isOpen, message, onConfirm, onClose }: AdviceProps) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleConfirm = async () => {
+        if (isProcessing) return; // evitar doble click
+
+        setIsProcessing(true);
+
+        try {
+            await onConfirm(); // ejecuta la acción real
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -27,21 +42,56 @@ export default function Advice({ isOpen, message, onConfirm, onClose }: AdvicePr
                         transition={{ duration: 0.3 }}
                     >
                         <p className="text-center text-gray-800 text-lg font-medium">{message}</p>
+
                         <div className="flex justify-center gap-4">
+                            {/* Botón NO */}
                             <button
                                 onClick={onClose}
-                                className="px-5 py-2 cursor-pointer rounded-md bg-gray-300 text-gray-800 font-medium hover:bg-gray-400 transition"
+                                disabled={isProcessing}
+                                className={`px-5 py-2 cursor-pointer rounded-md font-medium transition
+                                    ${isProcessing ? "bg-gray-200 text-gray-400 cursor-not-allowed" :
+                                        "bg-gray-300 text-gray-800 hover:bg-gray-400"}`}
                             >
                                 No
                             </button>
+
+                            {/* Botón SÍ */}
                             <button
-                                onClick={() => {
-                                    onConfirm();
-                                    onClose();
-                                }}
-                                className="px-5 py-2 rounded-md cursor-pointer bg-[#3F78A1] text-white font-medium hover:bg-[#356688] transition"
+                                onClick={handleConfirm}
+                                disabled={isProcessing}
+                                className={`px-5 py-2 rounded-md cursor-pointer font-medium transition flex items-center justify-center gap-2
+                                    ${isProcessing
+                                        ? "bg-[#3F78A1]/70 text-white cursor-not-allowed"
+                                        : "bg-[#3F78A1] text-white hover:bg-[#356688]"
+                                    }`}
                             >
-                                Sí
+                                {isProcessing ? (
+                                    <>
+                                        <svg
+                                            className="animate-spin h-5 w-5 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="white"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="white"
+                                                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 11-8 8h4z"
+                                            ></path>
+                                        </svg>
+                                        Procesando...
+                                    </>
+                                ) : (
+                                    "Sí"
+                                )}
                             </button>
                         </div>
                     </motion.div>
