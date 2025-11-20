@@ -86,7 +86,7 @@ export default function DetalleEventoPage() {
     const [deleteAdviceOpen, setDeleteAdviceOpen] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState("");
 
-    const handleCancelarAsistencia = async () => {
+    const handleCancelarAsistencia = async (): Promise<void> => {
         if (!user?.usuario_id) return;
 
         const res = await asistenciaApi.anularAsistencia({
@@ -95,10 +95,14 @@ export default function DetalleEventoPage() {
         });
 
         setAdviceMessage(res.message);
-        setAdviceOpen(true); // mostramos el mensaje final
 
-        // reload después de cerrar el modal (ya lo tienes abajo)
+        if (res.success) {
+            router.push("/");
+        } else {
+            setAdviceOpen(true);
+        }
     };
+
 
     const handleUnirse = async () => {
         if (!user?.usuario_id) return;
@@ -403,8 +407,8 @@ export default function DetalleEventoPage() {
                 message={adviceMessage}
                 onClose={() => {
                     setAdviceOpen(false);
-                    window.location.reload();
                 }}
+
             />
             <Advice
                 isOpen={cancelAdviceOpen}

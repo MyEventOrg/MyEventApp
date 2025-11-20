@@ -14,12 +14,13 @@ export default function Advice({ isOpen, message, onConfirm, onClose }: AdvicePr
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleConfirm = async () => {
-        if (isProcessing) return; // evitar doble click
+        if (isProcessing) return;
 
         setIsProcessing(true);
-
         try {
-            await onConfirm(); // ejecuta la acción real
+            const result = await onConfirm();
+            onClose(); // <-- CIERRA EL MODAL SOLO DESPUÉS DE TERMINAR
+            return result; // <-- DEVUELVE RESULTADO AL PADRE
         } finally {
             setIsProcessing(false);
         }
