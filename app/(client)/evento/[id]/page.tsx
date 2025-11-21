@@ -9,7 +9,10 @@ import asistenciaApi from "../../../api/invitacion";
 import AdviceSimple from "../../../components/AdviceSimple";
 import Advice from "../../../components/Advice";
 import ForoEvento from "../../../components/ForoEvento";
+import invitacionApi from "../../../api/invitacion";
 
+// JUAN-MODIFICACION: Import del modal de invitaciones (HU40)
+import InvitarPersonasModal from "../../../components/InvitarPersonasModal";
 
 // Representa el organizador del evento
 export interface Organizador {
@@ -50,11 +53,16 @@ export interface EventoWithExtras {
     asistentes: number;
 
     // Propiedades opcionales del frontend
+    // Por:
     asistentes_list?: {
+        usuario_id: number;
         nombre: string;
+        apodo: string | null;
         correo: string;
         url_imagen: string | null;
     }[];
+    foro?: { usuario: string; texto: string }[];
+
 }
 function buildStaticMapUrl(lat: string | null | undefined, lng: string | null | undefined): string | null {
     const key = "AIzaSyDdTo8nhURFO9BsyUd0LtaOH9VR7dmCIwM";
@@ -84,6 +92,11 @@ export default function DetalleEventoPage() {
     const [cancelAdviceOpen, setCancelAdviceOpen] = useState(false);
     const [deleteAdviceOpen, setDeleteAdviceOpen] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState("");
+    // JUAN-MODIFICACION: Estado para controlar el modal de invitaciones (HU40)
+    const [modalInvitarOpen, setModalInvitarOpen] = useState(false);
+    // Estados para búsqueda y menú de asistentes
+    const [buscarAsistente, setBuscarAsistente] = useState("");
+    const [menuAsistenteAbierto, setMenuAsistenteAbierto] = useState<number | null>(null);
 
     const handleCancelarAsistencia = async (): Promise<void> => {
         if (!user?.usuario_id) return;
@@ -115,6 +128,22 @@ export default function DetalleEventoPage() {
         setAdviceOpen(true);  // solo mostrar modal
     };
 
+    // Cerrar menú de asistente al hacer click fuera
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuAsistenteAbierto !== null) {
+                setMenuAsistenteAbierto(null);
+            }
+        };
+
+        if (menuAsistenteAbierto !== null) {
+            document.addEventListener('click', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [menuAsistenteAbierto]);
 
     useEffect(() => {
         if (userLoading) return;
@@ -168,6 +197,27 @@ export default function DetalleEventoPage() {
     };
     const mapUrl = buildStaticMapUrl(evento.latitud, evento.longitud);
     const linkToMaps = evento.url_direccion || (evento.latitud && evento.longitud ? `https://www.google.com/maps?q=${evento.latitud},${evento.longitud}` : undefined);
+    const handleEliminarAsistente = async (usuario_id: number, nombre: string) => {
+        if (!user?.usuario_id) return;
+
+        const res = await invitacionApi.eliminarAsistente(Number(id), usuario_id, user.usuario_id);
+
+        if (res.success) {
+            // Actualizar lista de asistentes
+            const nuevaLista = evento.asistentes_list?.filter(u => u.usuario_id !== usuario_id);
+            setEvento({
+                ...evento,
+                asistentes_list: nuevaLista,
+                asistentes: evento.asistentes - 1
+            });
+            setMenuAsistenteAbierto(null);
+            setAdviceMessage(`${nombre} ha sido eliminado del evento`);
+            setAdviceOpen(true);
+        } else {
+            setAdviceMessage(res.message || "Error al eliminar asistente");
+            setAdviceOpen(true);
+        }
+    };
     return (
         <main className="min-h-screen bg-[#F5F5F5]">
             {/* Header */}
@@ -341,7 +391,10 @@ export default function DetalleEventoPage() {
                             <h3 className="text-xl font-semibold mb-4">Acciones</h3>
 
                             <div className="flex gap-4">
-                                <button className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
+                                <button
+                                    onClick={() => setModalInvitarOpen(true)}
+                                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
+                                >
                                     Invitar Personas
                                 </button>
                                 <button onClick={() => router.push(`/editarEvento/${id}`)} className="bg-blue-200 hover:bg-blue-300 cursor-pointer text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
@@ -360,47 +413,134 @@ export default function DetalleEventoPage() {
                     {/* Asistentes */}
                     <section className="bg-white p-6 rounded-xl shadow">
                         <h3 className="text-xl font-semibold mb-4">
-                            Asistentes ({evento.asistentes_list?.length || 0})
+                            Asistentes ({(evento.asistentes_list || []).filter(u => {
+                                if (!buscarAsistente || buscarAsistente.length < 2) return true;
+                                const search = buscarAsistente.toLowerCase();
+                                return (
+                                    (u.apodo && u.apodo.toLowerCase().includes(search)) ||
+                                    u.correo.toLowerCase().includes(search) ||
+                                    u.nombre.toLowerCase().includes(search)
+                                );
+                            }).length})
                         </h3>
 
-                        <div className="max-h-64 overflow-y-auto pr-1">
-                            <ul className="space-y-3">
-                                {(evento.asistentes_list || []).map((u, i) => (
-                                    <li key={i} className="flex items-center gap-3">
-                                        {u.url_imagen ? (
-                                            <img
-                                                src={u.url_imagen}
-                                                alt={u.nombre}
-                                                className="w-8 h-8 rounded-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center font-bold text-white">
-                                                {u.nombre?.charAt(0).toUpperCase() || "U"}
+                        {/* Buscador */}
+                        {(evento.asistentes_list || []).length > 5 && (
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="Buscar asistente..."
+                                    value={buscarAsistente}
+                                    onChange={(e) => setBuscarAsistente(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        )}
+
+                        <div className={`pr-1 ${(evento.asistentes_list || []).length > 4 ? 'max-h-[340px] overflow-y-auto overflow-x-visible' : ''}`}>
+                            <ul className="space-y-3 pb-16">
+                                {(evento.asistentes_list || [])
+                                    .filter(u => {
+                                        if (!buscarAsistente || buscarAsistente.length < 2) return true;
+                                        const search = buscarAsistente.toLowerCase();
+                                        return (
+                                            (u.apodo && u.apodo.toLowerCase().includes(search)) ||
+                                            u.correo.toLowerCase().includes(search) ||
+                                            u.nombre.toLowerCase().includes(search)
+                                        );
+                                    })
+                                    .map((u, i) => (
+                                        <li key={i} className="flex items-center justify-between gap-3 py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                {u.url_imagen ? (
+                                                    <img
+                                                        src={u.url_imagen}
+                                                        alt={u.nombre}
+                                                        className="w-10 h-10 rounded-full object-cover shrink-0"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-bold text-white shrink-0">
+                                                        {(u.apodo || u.nombre)?.charAt(0).toUpperCase() || "U"}
+                                                    </div>
+                                                )}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm text-gray-800 truncate">
+                                                        <span className="font-bold">{u.apodo || u.nombre}</span>
+                                                        <span className="text-gray-500"> / {u.correo}</span>
+                                                    </p>
+                                                </div>
                                             </div>
-                                        )}
-                                        <span className="text-sm text-gray-800 truncate max-w-[200px]">
-                                            {u.correo}
-                                        </span>
-                                    </li>
-                                ))}
+
+                                            {/* Menú de opciones (solo para organizador) */}
+                                            {rol === "organizador" && (
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setMenuAsistenteAbierto(menuAsistenteAbierto === u.usuario_id ? null : u.usuario_id);
+                                                        }}
+                                                        className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                                                    >
+                                                        <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                                        </svg>
+                                                    </button>
+
+                                                    {/* Dropdown */}
+                                                    {menuAsistenteAbierto === u.usuario_id && (
+                                                        <div className="absolute right-0 top-full w-48 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleEliminarAsistente(u.usuario_id, u.apodo || u.nombre);
+                                                                }}
+                                                                className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                            >
+                                                                Eliminar asistente
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
                             </ul>
+                            {(evento.asistentes_list || []).filter(u => {
+                                if (!buscarAsistente || buscarAsistente.length < 2) return true;
+                                const search = buscarAsistente.toLowerCase();
+                                return (
+                                    (u.apodo && u.apodo.toLowerCase().includes(search)) ||
+                                    u.correo.toLowerCase().includes(search) ||
+                                    u.nombre.toLowerCase().includes(search)
+                                );
+                            }).length === 0 && buscarAsistente.length >= 2 && (
+                                    <p className="text-center text-gray-500 py-4">No se encontraron asistentes</p>
+                                )}
                         </div>
                     </section>
 
+
                     {/* Foro */}
-                    <ForoEvento 
-                        evento_id={evento.evento_id} 
-                        estado_evento={evento.estado_evento} 
+                    <ForoEvento
+                        evento_id={evento.evento_id}
+                        estado_evento={evento.estado_evento}
                     />
                 </div>
             </div>
             <AdviceSimple
                 isOpen={adviceOpen}
                 message={adviceMessage}
-                onClose={() => {
+                onClose={async () => {
                     setAdviceOpen(false);
+                    // Recargar datos del evento sin refrescar la página
+                    if (user?.usuario_id) {
+                        const res = await eventoApi.getEventoById(Number(id), user.usuario_id);
+                        if (res.success) {
+                            setEvento(res.data);
+                            setRol(res.data.rol);
+                        }
+                    }
                 }}
-
             />
             <Advice
                 isOpen={cancelAdviceOpen}
@@ -415,7 +555,23 @@ export default function DetalleEventoPage() {
                 onConfirm={handleDeleteEvento}
                 onClose={() => setDeleteAdviceOpen(false)}
             />
-
+            {/* JUAN-MODIFICACION: Modal de Invitar Personas (HU40) */}
+            {user && evento && (
+                <InvitarPersonasModal
+                    isOpen={modalInvitarOpen}
+                    onClose={() => setModalInvitarOpen(false)}
+                    eventoId={evento.evento_id}
+                    eventoTitulo={evento.titulo}
+                    organizadorId={user.usuario_id}
+                    onInvitacionEnviada={async () => {
+                        // Recargar evento para actualizar lista de asistentes sin refrescar la página
+                        const res = await eventoApi.getEventoById(Number(id), user.usuario_id);
+                        if (res.success) {
+                            setEvento(res.data);
+                        }
+                    }}
+                />
+            )}
         </main >
     );
 }

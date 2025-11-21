@@ -209,6 +209,8 @@ export default function Header() {
                             open={isNotificationOpen}
                             notificaciones={notificaciones}
                             onClickNotificacion={handleNotificacionClick}
+                            usuario_id={user?.usuario_id || 0}
+                            onRefresh={loadNotificaciones}
                         />
                     </li>
                 </ul>
