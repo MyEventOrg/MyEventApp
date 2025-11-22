@@ -38,7 +38,6 @@ export default function Header() {
         if (!user?.usuario_id) return;
 
         try {
-            console.log("📨 Cargando notificaciones desde API...");
             const res = await NotificacionApi.getNotificaciones(user.usuario_id);
             if (res.ok) {
                 setNotificaciones(res.notificaciones);
