@@ -32,7 +32,7 @@ export default function Header() {
     const notificationRef = useRef<HTMLLIElement>(null);
 
     // ----------------------------------------------------
-    // 🔄 Función reutilizable para cargar notificaciones
+    // Función reutilizable para cargar notificaciones
     // ----------------------------------------------------
     const loadNotificaciones = useCallback(async () => {
         if (!user?.usuario_id) return;
@@ -49,7 +49,7 @@ export default function Header() {
     }, [user?.usuario_id]);
 
     // ----------------------------------------------------
-    // 1️⃣ Cargar al iniciar / cuando cambia el usuario
+    // Cargar al iniciar / cuando cambia el usuario
     // ----------------------------------------------------
     useEffect(() => {
         if (!user?.usuario_id) return;
@@ -57,7 +57,7 @@ export default function Header() {
     }, [user?.usuario_id, loadNotificaciones]);
 
     // ----------------------------------------------------
-    // 2️⃣ Recargar cuando se abre o se cierra el panel
+    // Recargar cuando se abre o se cierra el panel
     // ----------------------------------------------------
     useEffect(() => {
         if (!user?.usuario_id) return;
@@ -72,7 +72,7 @@ export default function Header() {
     }, [isNotificationOpen, user?.usuario_id, loadNotificaciones]);
 
     // ----------------------------------------------------
-    // 3️⃣ POLLING cada 10 segundos
+    // POLLING cada 10 segundos
     // ----------------------------------------------------
     useEffect(() => {
         if (!user?.usuario_id) return;

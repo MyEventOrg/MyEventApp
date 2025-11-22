@@ -30,7 +30,6 @@ const asistirEvento = async (data: AsistenciaRequest): Promise<AsistenciaRespons
     }
 };
 
-// 👉 Anular asistencia
 const anularAsistencia = async (data: AsistenciaRequest): Promise<AsistenciaResponse> => {
     try {
         const response = await base.post("/anularAsistencia", data);
@@ -67,6 +66,7 @@ export interface EnviarInvitacionesResponse {
 }
 
 export interface ResponderInvitacionRequest {
+    usuarioQueResponde_id: number,
     invitado_id: number;
     accion: "aceptar" | "rechazar";
 }
@@ -119,6 +119,7 @@ const responderInvitacion = async (
         };
     }
 };
+
 
 /**
  * Obtener invitaciones pendientes de un usuario

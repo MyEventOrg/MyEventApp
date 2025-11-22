@@ -111,16 +111,27 @@ const eliminarCuenta = async () => {
     }
 };
 
+const buscarUsuarioXCorreo = async (correo: string) => {
+    try {
+        const res = await base.get(`/usuarios/buscarPorCorreo/${correo}`);
+        return res.data;
+    } catch (error: any) {
+        if (error.response) return error.response.data;
+        return { success: false, message: "No se encontró el usuario" };
+    }
+};
+
 // Export único con todas las funciones
-export default { 
-    iniciarSesion, 
-    cerrarSesion, 
-    crearUsuario, 
-    getUsuariosAdmin, 
+export default {
+    iniciarSesion,
+    cerrarSesion,
+    crearUsuario,
+    getUsuariosAdmin,
     updateUsuarioEstado,
     getPerfil,
     updatePerfil,
     updateFotoPerfil,
     eliminarFotoPerfil,
-    eliminarCuenta
+    eliminarCuenta,
+    buscarUsuarioXCorreo
 };

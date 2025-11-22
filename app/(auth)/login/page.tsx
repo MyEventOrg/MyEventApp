@@ -110,7 +110,6 @@ export default function LoginPage() {
                 </Link>
             </p>
 
-            {/* ✅ Aviso global */}
             <Aviso mensaje={mensajeAviso} visible={visible} tipo={tipo} />
         </>
     );

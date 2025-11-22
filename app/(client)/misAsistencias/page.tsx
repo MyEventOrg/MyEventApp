@@ -23,7 +23,6 @@ export default function MisAsistencias() {
             try {
                 const resp = await eventoAsistidoApi.getEventosAsistidos(user.usuario_id);
                 if (!activo) return;
-                // 👇 Asegúrate de acceder a .eventosAsistiendo, no .eventosCreados
                 setEventos(resp.data.eventosAsistiendo || []);
             } catch (error) {
                 console.error("Error cargando eventos asistidos:", error);

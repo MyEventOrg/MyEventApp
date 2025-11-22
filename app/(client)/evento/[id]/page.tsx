@@ -387,29 +387,44 @@ export default function DetalleEventoPage() {
                 {/* Columna derecha */}
                 <div className="lg:col-span-5 space-y-10">
                     {rol === "organizador" && (
-                        <section className="bg-white p-6 rounded-xl shadow">
-                            <h3 className="text-xl font-semibold mb-4">Acciones</h3>
+                        evento.estado_evento === "vencido" ? (
+                            // Eventos vencidos :: sección bloqueada
+                            <section className="bg-white p-6 rounded-xl shadow">
+                                <h3 className="text-xl font-semibold mb-4">
+                                    Sección de acciones deshabilitada para eventos vencidos
+                                </h3>
+                            </section>
+                        ) : (
+                            // Eventos activos :: acciones disponibles
+                            <section className="bg-white p-6 rounded-xl shadow">
+                                <h3 className="text-xl font-semibold mb-4">Acciones</h3>
 
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => setModalInvitarOpen(true)}
-                                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
-                                >
-                                    Invitar Personas
-                                </button>
-                                <button onClick={() => router.push(`/editarEvento/${id}`)} className="bg-blue-200 hover:bg-blue-300 cursor-pointer text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
-                                    Editar Evento
-                                </button>
-                                <button
-                                    onClick={confirmDeleteEvento}
-                                    className="bg-red-600 hover:bg-red-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
-                                >
-                                    Eliminar Evento
-                                </button>
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setModalInvitarOpen(true)}
+                                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
+                                    >
+                                        Invitar Personas
+                                    </button>
 
-                            </div>
-                        </section>
+                                    <button
+                                        onClick={() => router.push(`/editarEvento/${id}`)}
+                                        className="bg-blue-200 hover:bg-blue-300 cursor-pointer text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
+                                    >
+                                        Editar Evento
+                                    </button>
+
+                                    <button
+                                        onClick={confirmDeleteEvento}
+                                        className="bg-red-600 hover:bg-red-700 cursor-pointer text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all"
+                                    >
+                                        Eliminar Evento
+                                    </button>
+                                </div>
+                            </section>
+                        )
                     )}
+
                     {/* Asistentes */}
                     <section className="bg-white p-6 rounded-xl shadow">
                         <h3 className="text-xl font-semibold mb-4">

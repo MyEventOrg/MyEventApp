@@ -58,14 +58,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const token = getCookie("token");
             if (!token) {
-                console.log('❌ No hay token en cookie');
+                console.log('No hay token en cookie');
                 setUser(null);
                 return;
             }
 
             const payload = decodeJwt<UserPayload>(token);
             if (!payload) {
-                console.log('❌ No se pudo decodificar el token');
+                console.log('No se pudo decodificar el token');
                 setUser(null);
                 return;
             }

@@ -197,7 +197,7 @@ export default function EventCardBuscar({
         }
     };
 
-    // ✅ Control de clic en corazón
+ 
     const handleHeartClick = () => {
         if (liked) {
             setAdviceOpen(true); // abre popup antes de eliminar

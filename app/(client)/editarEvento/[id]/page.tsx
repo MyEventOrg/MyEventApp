@@ -54,7 +54,7 @@ export default function EditarEvento() {
         url_recurso: null,
     });
 
-    // 🔥 NUEVO: Copia del formulario original
+
     const [originalForm, setOriginalForm] = useState<EventFormData | null>(null);
 
     const [hayCambios, setHayCambios] = useState(false);
@@ -125,7 +125,7 @@ export default function EditarEvento() {
                 };
 
                 setForm(parsed);
-                setOriginalForm(parsed); // 🔥 Guardamos el formulario original
+                setOriginalForm(parsed);
 
                 if (ev.latitud && ev.longitud) {
                     setSelectedPosition({ lat: Number(ev.latitud), lng: Number(ev.longitud) });
@@ -144,7 +144,7 @@ export default function EditarEvento() {
     }, [userLoading, isAuthenticated, id]);
 
     // ================================================================
-    // 🔥 DETECTAR CAMBIOS AUTOMÁTICAMENTE
+    // DETECTAR CAMBIOS AUTOMÁTICAMENTE
     // ================================================================
     useEffect(() => {
         if (!originalForm) return;
@@ -153,7 +153,7 @@ export default function EditarEvento() {
             JSON.stringify({ ...form, url_recurso: null }) !==
             JSON.stringify({ ...originalForm, url_recurso: null });
 
-        const imageChanged = imageFile !== null; // 🔥 si hay nueva imagen, es un cambio
+        const imageChanged = imageFile !== null;
 
         setHayCambios(formChanged || imageChanged);
     }, [form, originalForm, imageFile]);

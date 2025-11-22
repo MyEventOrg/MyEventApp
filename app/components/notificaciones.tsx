@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InvitacionApi from "../api/invitacion";
+import UsuarioApi from "../api/usuario";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -10,6 +11,11 @@ type Props = {
     onClickNotificacion: (id: number) => void;
     usuario_id: number; // JUAN-MODIFICACION: Necesario para responder invitaciones
     onRefresh: () => void; // JUAN-MODIFICACION: Callback para recargar notificaciones
+};
+const extraerCorreoDeMensaje = (mensaje: string): string | null => {
+    const regex = /correo:\s*"([^"]+)"/i;
+    const match = mensaje.match(regex);
+    return match ? match[1] : null;
 };
 
 export default function Notificaciones({ open, notificaciones, onClickNotificacion, usuario_id, onRefresh }: Props) {
@@ -35,35 +41,58 @@ export default function Notificaciones({ open, notificaciones, onClickNotificaci
         accion: "aceptar" | "rechazar",
         e: React.MouseEvent
     ) => {
-        e.stopPropagation(); // Evitar que se marque como vista
-
+        e.stopPropagation();
         setProcesando(notificacion.notificacion_id);
 
         try {
-            // 1. Buscar la invitación pendiente
+            // 1. EXTRAER CORREO DEL MENSAJE (si aplica)
+            const correo = extraerCorreoDeMensaje(notificacion.mensaje);
+
+            let invitado_id = usuario_id; // Por defecto: invitación normal
+
+            if (correo) {
+                // 2. BUSCAR EL USUARIO POR EL CORREO EN EL BACKEND
+                const usuarioRes = await UsuarioApi.buscarUsuarioXCorreo(correo);
+
+                if (!usuarioRes.success || !usuarioRes.data) {
+                    toast.error("No se encontró el usuario del correo");
+                    setProcesando(null);
+                    return;
+                }
+
+                // este es el solicitante real que será agregado
+                invitado_id = usuarioRes.data.usuario_id;
+            }
+
+            // 3. OBTENER INVITACIÓN PENDIENTE
             const invRes = await InvitacionApi.obtenerInvitacionPendiente(
                 notificacion.evento_id,
-                usuario_id
+                invitado_id
             );
 
             if (!invRes.success || !invRes.data) {
-                toast.error("No se encontró la invitación");
+                toast.error("No se encontró la invitación pendiente");
                 setProcesando(null);
                 return;
             }
 
-            // 2. Responder la invitación
+            // 4. RESPONDER INVITACIÓN
             const respuesta = await InvitacionApi.responderInvitacion(
                 invRes.data.invitacion_id,
-                { invitado_id: usuario_id, accion }
+                {
+                    usuarioQueResponde_id: usuario_id, // <- quien responde (organizador o invitado)
+                    invitado_id,                       // <- quien será agregado al evento
+                    accion
+                }
             );
 
             if (respuesta.success) {
-                toast.success(respuesta.message); // Usar mensaje del backend
-                onRefresh(); // Recargar notificaciones
+                toast.success(respuesta.message);
+                onRefresh();
             } else {
                 toast.error(respuesta.message);
             }
+
         } catch (error) {
             console.error("Error al responder invitación:", error);
             toast.error("Error al procesar la respuesta");
@@ -71,6 +100,7 @@ export default function Notificaciones({ open, notificaciones, onClickNotificaci
             setProcesando(null);
         }
     };
+
 
     return (
         <div

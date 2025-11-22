@@ -192,7 +192,7 @@ export default function InvitarPersonasModal({
                     problemas.forEach((problema, index) => {
                         setTimeout(() => {
                             toast(problema, { 
-                                icon: "⚠️",
+                                icon: "!",
                                 duration: 5000,
                                 style: {
                                     maxWidth: '500px',
@@ -211,7 +211,7 @@ export default function InvitarPersonasModal({
                 // Si hubo éxito, mostrar mensaje de éxito
                 const rolTexto = rol === "asistente" ? "asistente(s)" : "co-administrador(es)";
                 toast.success(
-                    `✅ ${resultado.invitaciones_enviadas} invitación(es) enviada(s) como ${rolTexto}`,
+                    `${resultado.invitaciones_enviadas} invitación(es) enviada(s) como ${rolTexto}`,
                     { duration: 4000 }
                 );
                 
@@ -219,18 +219,18 @@ export default function InvitarPersonasModal({
                 if (resultado.correos_ya_participan && resultado.correos_ya_participan.length > 0) {
                     const count = resultado.correos_ya_participan.length;
                     toast(count === 1 
-                        ? `⚠️ ${resultado.correos_ya_participan[0]} ya participa` 
-                        : `⚠️ ${count} usuarios ya participan`, 
-                        { icon: "ℹ️", duration: 4000 }
+                        ? `${resultado.correos_ya_participan[0]} ya participa` 
+                        : `${count} usuarios ya participan`, 
+                        { icon: "!", duration: 4000 }
                     );
                 }
                 
                 if (resultado.correos_no_encontrados && resultado.correos_no_encontrados.length > 0) {
                     const count = resultado.correos_no_encontrados.length;
                     toast(count === 1 
-                        ? `⚠️ ${resultado.correos_no_encontrados[0]} no registrado` 
-                        : `⚠️ ${count} correos no registrados`, 
-                        { icon: "ℹ️", duration: 4000 }
+                        ? `${resultado.correos_no_encontrados[0]} no registrado` 
+                        : `${count} correos no registrados`, 
+                        { icon: "!", duration: 4000 }
                     );
                 }
                 
@@ -318,7 +318,7 @@ export default function InvitarPersonasModal({
                         {/* JUAN-MODIFICACION: Mensaje de error visible */}
                         {errorMensaje ? (
                             <p className="text-xs text-red-600 mt-1 font-medium">
-                                ⚠️ {errorMensaje}
+                                {errorMensaje}
                             </p>
                         ) : (
                             <p className="text-xs text-gray-500 mt-1">
