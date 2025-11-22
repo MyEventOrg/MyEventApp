@@ -7,6 +7,7 @@ export interface Notificacion {
     fecha_creacion: string;
     mensaje: string;
     visto: boolean;
+    tipo: "normal" | "invitacion"; // JUAN-MODIFICACION: Tipo de notificación
     usuario_id: number;
     evento_id: number;
 }

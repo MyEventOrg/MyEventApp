@@ -141,62 +141,104 @@ export default function InvitarPersonasModal({
                 mensaje: undefined // Por ahora sin mensaje personalizado
             });
 
-            if (resultado.success) {
-                // JUAN-MODIFICACION: Toast solo cuando hay éxito o errores importantes
+            // JUAN-MODIFICACION: Mostrar retroalimentación detallada siempre
+            // Si todas fallaron, mostrar por qué
+            if (resultado.invitaciones_enviadas === 0) {
+                const problemas = [];
                 
-                // Si todas fallaron, mostrar por qué
-                if (resultado.invitaciones_enviadas === 0) {
-                    let mensajeError = "No se pudo enviar ninguna invitación:";
-                    
-                    if (resultado.correos_ya_participan.length > 0) {
-                        mensajeError += `\n• Ya participan: ${resultado.correos_ya_participan.join(", ")}`;
-                    }
-                    if (resultado.correos_ya_invitados.length > 0) {
-                        mensajeError += `\n• Ya invitados: ${resultado.correos_ya_invitados.join(", ")}`;
-                    }
-                    if (resultado.correos_rechazaron && resultado.correos_rechazaron.length > 0) {
-                        mensajeError += `\n• Rechazaron anteriormente: ${resultado.correos_rechazaron.join(", ")}`;
-                    }
-                    if (resultado.correos_no_encontrados.length > 0) {
-                        mensajeError += `\n• No registrados: ${resultado.correos_no_encontrados.join(", ")}`;
-                    }
-                    if (resultado.correos_mismo_organizador && resultado.correos_mismo_organizador.length > 0) {
-                        mensajeError += `\n• Eres tú: ${resultado.correos_mismo_organizador.join(", ")}`;
-                    }
-                    
-                    toast.error(mensajeError, { duration: 6000 });
-                } else {
-                    // Si hubo éxito, mostrar mensaje específico según el rol
-                    const rolTexto = rol === "asistente" ? "asistente(s)" : "co-administrador(es)";
-                    toast.success(
-                        `✅ ${resultado.invitaciones_enviadas} invitación(es) enviada(s) como ${rolTexto}`,
-                        { duration: 4000 }
-                    );
-                    
-                    // Mostrar advertencias de los que no se pudieron si hubo algunos exitosos
-                    if (resultado.correos_ya_participan.length > 0) {
-                        toast(`⚠️ Ya participan: ${resultado.correos_ya_participan.join(", ")}`, { 
-                            icon: "ℹ️", 
-                            duration: 4000 
-                        });
-                    }
-                    if (resultado.correos_no_encontrados.length > 0) {
-                        toast(`⚠️ No registrados: ${resultado.correos_no_encontrados.join(", ")}`, { 
-                            icon: "ℹ️", 
-                            duration: 4000 
-                        });
+                if (resultado.correos_ya_participan && resultado.correos_ya_participan.length > 0) {
+                    const count = resultado.correos_ya_participan.length;
+                    if (count === 1) {
+                        problemas.push(`${resultado.correos_ya_participan[0]} ya participa en el evento`);
+                    } else {
+                        problemas.push(`${count} usuarios ya participan`);
                     }
                 }
-
-                // Limpiar y cerrar solo si hubo éxito
-                if (resultado.invitaciones_enviadas > 0) {
-                    setCorreos([]);
-                    setInputValue("");
-                    onInvitacionEnviada?.();
-                    onClose();
+                
+                if (resultado.correos_ya_invitados && resultado.correos_ya_invitados.length > 0) {
+                    const count = resultado.correos_ya_invitados.length;
+                    if (count === 1) {
+                        problemas.push(`${resultado.correos_ya_invitados[0]} ya tiene invitación pendiente`);
+                    } else {
+                        problemas.push(`${count} usuarios ya tienen invitaciones pendientes`);
+                    }
+                }
+                
+                if (resultado.correos_rechazaron && resultado.correos_rechazaron.length > 0) {
+                    const count = resultado.correos_rechazaron.length;
+                    if (count === 1) {
+                        problemas.push(`${resultado.correos_rechazaron[0]} rechazó anteriormente`);
+                    } else {
+                        problemas.push(`${count} usuarios rechazaron anteriormente`);
+                    }
+                }
+                
+                if (resultado.correos_no_encontrados && resultado.correos_no_encontrados.length > 0) {
+                    const count = resultado.correos_no_encontrados.length;
+                    if (count === 1) {
+                        problemas.push(`${resultado.correos_no_encontrados[0]} no está registrado`);
+                    } else {
+                        problemas.push(`${count} correos no registrados`);
+                    }
+                }
+                
+                if (resultado.correos_mismo_organizador && resultado.correos_mismo_organizador.length > 0) {
+                    problemas.push("No puedes invitarte a ti mismo");
+                }
+                
+                // Mostrar un toast por cada problema para mejor legibilidad
+                if (problemas.length > 0) {
+                    // Primero mostrar los detalles específicos
+                    problemas.forEach((problema, index) => {
+                        setTimeout(() => {
+                            toast(problema, { 
+                                icon: "⚠️",
+                                duration: 5000,
+                                style: {
+                                    maxWidth: '500px',
+                                }
+                            });
+                        }, index * 100); // Pequeño delay para que aparezcan ordenados
+                    });
+                    // Al final mostrar el mensaje principal
+                    setTimeout(() => {
+                        toast.error("No se pudo enviar invitaciones", { duration: 5000 });
+                    }, problemas.length * 100);
+                } else {
+                    toast.error("No se pudo enviar ninguna invitación", { duration: 5000 });
                 }
             } else {
-                toast.error(resultado.message || "Error al enviar invitaciones");
+                // Si hubo éxito, mostrar mensaje de éxito
+                const rolTexto = rol === "asistente" ? "asistente(s)" : "co-administrador(es)";
+                toast.success(
+                    `✅ ${resultado.invitaciones_enviadas} invitación(es) enviada(s) como ${rolTexto}`,
+                    { duration: 4000 }
+                );
+                
+                // Mostrar advertencias de los que no se pudieron (si hubo algunos exitosos y otros fallidos)
+                if (resultado.correos_ya_participan && resultado.correos_ya_participan.length > 0) {
+                    const count = resultado.correos_ya_participan.length;
+                    toast(count === 1 
+                        ? `⚠️ ${resultado.correos_ya_participan[0]} ya participa` 
+                        : `⚠️ ${count} usuarios ya participan`, 
+                        { icon: "ℹ️", duration: 4000 }
+                    );
+                }
+                
+                if (resultado.correos_no_encontrados && resultado.correos_no_encontrados.length > 0) {
+                    const count = resultado.correos_no_encontrados.length;
+                    toast(count === 1 
+                        ? `⚠️ ${resultado.correos_no_encontrados[0]} no registrado` 
+                        : `⚠️ ${count} correos no registrados`, 
+                        { icon: "ℹ️", duration: 4000 }
+                    );
+                }
+                
+                // Limpiar y cerrar solo si hubo éxito
+                setCorreos([]);
+                setInputValue("");
+                onInvitacionEnviada?.();
+                onClose();
             }
         } catch (error) {
             toast.error("Error al enviar invitaciones");
